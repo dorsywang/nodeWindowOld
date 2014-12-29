@@ -147,7 +147,7 @@ var parse = function(htmlStr, scopeSpace){
             }
 
             if(tagName === "script"){
-                var content = require("../dev/" + attrsObj.src.replace(/\?.*/g, ""));
+                var content = drequire(attrsObj.src.replace(/\?.*/g, ""));
                 for(var i in content){
                     global[i] = content[i];
                 }

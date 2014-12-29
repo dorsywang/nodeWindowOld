@@ -6,6 +6,8 @@ var location = require("./location");
 var navigator = require("./navigator");
 var document = require("./document");
 var xhr = require("./xhr");
+var fs = require("fs");
+var path = require("path");
 
 
 var window = {
@@ -36,6 +38,18 @@ var window = {
                 return "";
             }
         };
+    },
+
+    drequire: function(js){
+        var script = process.binding("evals").NodeScript;
+        
+        var filename = js;
+
+        var filepath = path.resolve(__basePath, filename);
+
+        var content = fs.readFileSync(filepath, {encoding: "utf-8"});
+
+        script.runInThisContext(content);
     }
 };
 

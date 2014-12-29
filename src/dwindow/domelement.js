@@ -105,7 +105,7 @@ Element.prototype = {
         }
 
         if(newNode.tagName === "script"){
-            var content = require("../../dev/" + newNode.src.replace(/\?.*/g, ""));
+            var content = drequire(newNode.src.replace(/\?.*/g, ""));
             for(var i in content){
                 global[i] = content[i];
             }
