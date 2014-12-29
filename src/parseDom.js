@@ -85,7 +85,11 @@ var parse = function(htmlStr, scopeSpace){
     var _idMap = docTree._idMap; 
     var _allNode = docTree._allNode;
 
-    var preTagReg = /\s*<(\/?)([^>\s]+)([^>]*)>/g;
+    var tagReg = /\s*<(\/?)([^>\s]+)([^>]*)>/g;
+
+    // 这里的reg要优化
+    //var textReg = /.*(?=<\/?[^>]*>)/g;
+    var textReg = /^[^<]*/g;
     // 这里只做了 ""  还要加上'
     var attrReg = /([^=\s]+)=(?:"([^\"]*)"|'([^\']*)')/g;
 
@@ -94,7 +98,7 @@ var parse = function(htmlStr, scopeSpace){
      * 分析元素树
      */
     var tagResult, attrResult, attrsObj;
-    while(tagResult = preTagReg.exec(htmlStr)){
+    while(tagResult = tagReg.exec(htmlStr)){
         var isEndTag = tagResult[1] === "/";
         var tagName = tagResult[2];
         // 这里是未分析的属性
@@ -158,6 +162,30 @@ var parse = function(htmlStr, scopeSpace){
                 // 向下遍历
                 // 走向子结点
                 docTree.goNext();
+
+                textReg.lastIndex = tagReg.lastIndex;
+
+                // 查找文字节点
+                var textResult = textReg.exec(htmlStr);
+
+                console.log(tagResult[0]);
+                console.log(tagReg.lastIndex);
+
+                if(textResult && textResult.length){
+                    var text = textResult[0];
+                    console.log(text);
+
+                    var node = new domEle.Element();
+                    node.nodeType = 3;
+                    node.nodeValue = text;
+
+                    docTree.push(node);
+                }
+
+                console.log(textReg.lastIndex);
+                textReg.lastIndex > 0 && (tagReg.lastIndex = textReg.lastIndex);
+
+            }else{
             }
 
         }else{
