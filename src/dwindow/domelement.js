@@ -15,6 +15,7 @@ var emptyFuc = function(returnVal){
 
 var Element = function(opt){
     this.childNodes = [];
+    this.style = {};
 };
 
 Element.prototype = {
@@ -189,13 +190,11 @@ Element.prototype = {
         return sizzle(selector, content);
     },
 
-    style: {
-    },
 
     get outerHTML(){
         var tagName = this.tagName;
         if(this.nodeType === 3 || ! tagName){
-            return "";
+            return this.nodeValue || "";
         }
 
         var attrArr = [];
@@ -212,6 +211,15 @@ Element.prototype = {
                 }
 
                 attrArr.push(attrName + "=\"" + this[i] + "\"");
+            }else if(i === "style"){
+                console.log('style');
+                var styleCode = [];
+                for(var i in this.style){
+                    styleCode.push(i + ":" + this.style[i]);
+                }
+                if(styleCode.length){
+                    attrArr.push("style=\"" + styleCode.join(";") + "\"");
+                }
             }
         }
 

@@ -98,6 +98,7 @@ var parse = function(htmlStr, scopeSpace){
      * 分析元素树
      */
     var tagResult, attrResult, attrsObj;
+    var lastIndex = 0;
     while(tagResult = tagReg.exec(htmlStr)){
         var isEndTag = tagResult[1] === "/";
         var tagName = tagResult[2];
@@ -110,7 +111,19 @@ var parse = function(htmlStr, scopeSpace){
             isSelfEnd = 1;
         }
 
-        
+        var start = lastIndex;
+        var len = tagReg.lastIndex - tagResult[0].length - start;
+
+        var text = htmlStr.substr(start, len);
+
+        if(text){
+            var textNode = new domEle.Element();
+            textNode.nodeType = 3;
+            textNode.nodeValue = text;
+
+            docTree.push(textNode);
+        }
+
 
         // 如果不是preTag
         if(! isEndTag){
@@ -163,6 +176,7 @@ var parse = function(htmlStr, scopeSpace){
                 // 走向子结点
                 docTree.goNext();
 
+                /*
                 textReg.lastIndex = tagReg.lastIndex;
 
                 // 查找文字节点
@@ -184,6 +198,7 @@ var parse = function(htmlStr, scopeSpace){
 
                 console.log(textReg.lastIndex);
                 textReg.lastIndex > 0 && (tagReg.lastIndex = textReg.lastIndex);
+                */
 
             }else{
             }
@@ -197,6 +212,8 @@ var parse = function(htmlStr, scopeSpace){
             // 回溯到该子结点的级别
             docTree.backUp();
         }
+
+        lastIndex = tagReg.lastIndex;
     }
 
     /**

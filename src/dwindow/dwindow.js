@@ -22,6 +22,9 @@ var window = {
         getItem: function(){
         }
     },
+    alert: function(val){
+        console.log(val);
+    },
 
     addEventListener: function(type, handler, isCapture){
     },
@@ -32,9 +35,12 @@ var window = {
         return document.createElement("image");
     },
 
-    getComputedStyle: function(){
+    getComputedStyle: function(node){
         return {
-            getPropertyValue: function(){
+            getPropertyValue: function(name){
+                if(name === "display"){
+                    //node.style.display
+                }
                 return "";
             }
         };
@@ -49,6 +55,7 @@ var window = {
 
         var content = fs.readFileSync(filepath, {encoding: "utf-8"});
 
+        //console.log(filepath);
         script.runInThisContext(content);
     }
 };
