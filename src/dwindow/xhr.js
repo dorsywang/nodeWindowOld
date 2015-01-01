@@ -22,7 +22,7 @@ xhr.prototype = {
         var _this = this;
         var u = url.parse(this.url);
 
-        var cookie =  "piao_city=221; _ga=GA1.2.1928717429.1387360419; RK=aenukl/0Mr; pt2gguin=o0314416946; uin=o0314416946; skey=@ilsZyV8lW; ptisp=ctc; ptcz=d941743d45947fc7677d8d66b3a54da91851b6cf957c95fbef7c8a4992787d00; pgv_info=ssid=s7283351872; pgv_pvid=7910403600; o_cookie=314416946; pgv_pvi=159959040; pgv_si=s4218576896";
+        var cookie =  "_ga=GA1.2.1928717429.1387360419; RK=aenukl/0Mr; pgv_info=ssid=s7283351872; pgv_pvid=7910403600; o_cookie=314416946; pgv_pvi=159959040; pgv_si=s4218576896; ptui_loginuin=honghu91@hotmail.com; ptisp=ctc; ptcz=d941743d45947fc7677d8d66b3a54da91851b6cf957c95fbef7c8a4992787d00; pt2gguin=o0314416946; uin=o0314416946; skey=@N7cH5hC9g";
 
 
         var headers = {

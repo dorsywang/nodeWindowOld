@@ -36,6 +36,7 @@ var window = {
     },
 
     getComputedStyle: function(node){
+        console.log("get style");
         return {
             getPropertyValue: function(name){
                 if(name === "display"){
@@ -55,7 +56,8 @@ var window = {
 
         var content = fs.readFileSync(filepath, {encoding: "utf-8"});
 
-        //console.log(filepath);
+        console.log(filename);
+
         script.runInThisContext(content);
     }
 };

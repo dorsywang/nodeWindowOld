@@ -57,9 +57,6 @@ module.exports = {
     addEventListener: function(event, handler, isCapture){
     },
 
-    documentElement: {
-        className: ""
-    },
 
     getElementById: function(id){
         return DOMTREE.getNodeById(id);
@@ -83,9 +80,13 @@ module.exports = {
     },
 
     getElementsByTagName: function(tagName){
+        console.log("get element by tagName:", tagName);
+
+        /*
         var item;
         var result = [];
         var allNodes = DOMTREE.getAllNodes();
+
         for(var i = 0; i < allNodes.length; i ++){
             item = allNodes[i];
 
@@ -95,9 +96,17 @@ module.exports = {
         }
 
         return result;
+        */
+
+        if(tagName === "html"){
+            return [this.documentElement];
+        }else{
+            return this.documentElement.getElementsByTagName(tagName);
+        }
     },
 
     querySelectorAll: function(selector){
+        console.log("document query: ", selector);
         //console.log("document querySelector:", selector);
         return [];
     },

@@ -13,6 +13,6 @@ module.exports = function(req, res,next){
     setTimeout(function(){
         RES.write(document.getElementsByTagName("html")[0].outerHTML);
         RES.end();
-    }, 400);
+    }, 100);
 
 };

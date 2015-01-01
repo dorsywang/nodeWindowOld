@@ -457,6 +457,7 @@ isXML = Sizzle.isXML = function( elem ) {
 	// documentElement is verified for cases where it doesn't yet exist
 	// (such as loading iframes in IE - #4833)
 	var documentElement = elem && (elem.ownerDocument || elem).documentElement;
+
 	return documentElement ? documentElement.nodeName !== "HTML" : false;
 };
 
@@ -893,7 +894,7 @@ Sizzle.attr = function( elem, name ) {
 		val :
 		support.attributes || !documentIsHTML ?
 			elem.getAttribute( name ) :
-			(val = elem.getAttributeNode(name)) && val.specified ?
+            (val = elem.getAttributeNode(name)) && val.specified ?
 				val.value :
 				null;
 };
@@ -1776,7 +1777,9 @@ function matcherFromTokens( tokens ) {
 		}
 	}
 
-	return elementMatcher( matchers );
+
+    var a = elementMatcher( matchers );
+    return a;
 }
 
 function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
@@ -1905,6 +1908,7 @@ compile = Sizzle.compile = function( selector, match /* Internal Use Only */ ) {
 		// Save selector and tokenization
 		cached.selector = selector;
 	}
+
 	return cached;
 };
 
@@ -1923,6 +1927,8 @@ select = Sizzle.select = function( selector, context, results, seed ) {
 		match = !seed && tokenize( (selector = compiled.selector || selector) );
 
 	results = results || [];
+
+
 
 	// Try to minimize operations if there is no seed and only one group
 	if ( match.length === 1 ) {
@@ -1954,6 +1960,7 @@ select = Sizzle.select = function( selector, context, results, seed ) {
 			if ( Expr.relative[ (type = token.type) ] ) {
 				break;
 			}
+
 			if ( (find = Expr.find[ type ]) ) {
 				// Search, expanding context for leading sibling combinators
 				if ( (seed = find(

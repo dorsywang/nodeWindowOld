@@ -118,7 +118,7 @@ var parse = function(htmlStr, scopeSpace){
 
         if(text){
             var textNode = new domEle.Element();
-            textNode.nodeType = 3;
+            textNode.nodeType = textNode.TEXT_NODE;
             textNode.nodeValue = text;
 
             docTree.push(textNode);
@@ -131,7 +131,7 @@ var parse = function(htmlStr, scopeSpace){
             // 先将此结点压入
             var node = new domEle.Element();
             node.tagName = tagName;
-            node.nodeType = 1;
+            node.nodeType = node.ELEMENT_NODE;
 
             // 这里分析属性
             attrsObj = {};
@@ -161,6 +161,10 @@ var parse = function(htmlStr, scopeSpace){
 
             if(tagName === "body"){
                 document.body = node;
+            }
+
+            if(tagName === "html"){
+                document.documentElement = node;
             }
 
             if(tagName === "script"){

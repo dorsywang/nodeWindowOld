@@ -22,6 +22,25 @@ Element.prototype = {
     blur: function(){
     },
 
+    get ownerDocument(){
+        return document;
+    },
+
+    get children(){
+        var els = [];
+        for(var i = 0; i < this.childNodes.length; i ++){
+            if(this.childNodes[i].nodeType === 1){
+                els.push(this.childNodes[i]);
+            }
+        }
+
+        return els;
+    },
+
+    get nodeName(){
+        return (this.tagName || "").toUpperCase();
+    },
+
     focus: function(){
     },
 
@@ -41,7 +60,11 @@ Element.prototype = {
 
     },
 
+    addEventListener: function(type, handler, isCapture){
+    },
+
     getAttribute: function(attr){
+        console.log('get attribute', attr);
         return this[attr];
     },
     setAttribute: function(attr, val){
@@ -83,6 +106,7 @@ Element.prototype = {
             for(var i = 0; i < newNode.childNodes.length; i ++){
                 newNode.childNodes[i].parentNode = this;
 
+                // 这里有待完善
                 if(isInDocument){
                     newNode.childNodes[i].getIdMap(DOMTREE._idMap);
                 }
@@ -100,6 +124,7 @@ Element.prototype = {
 
             this.childNodes.splice(i, 0, newNode);
 
+            // 这里有待完善
             if(isInDocument){
                 newNode.getIdMap(DOMTREE._idMap);
             }
@@ -118,9 +143,14 @@ Element.prototype = {
 
     // 这里实现有待进一步验证
     getAttributeNode: function(attr){
-        return this;
+        console.log("getAttributeNode", attr, this[attr]);
+        return {
+            value: this[attr],
+            specified: true
+        };
     },
 
+    // 把id 挂到命名空间下
     getIdMap: function(scopeSpace){
         if(! scopeSpace) return;
 
@@ -186,8 +216,13 @@ Element.prototype = {
     },
 
     querySelectorAll: function(selector, content){
+        console.log("using queryAll single node:", selector);
         var sizzle = require("./../sizzle/sizzle");
-        return sizzle(selector, content);
+        var els =  sizzle(selector, content);
+
+        console.log(els);
+
+        return els;
     },
 
 
@@ -264,7 +299,16 @@ Element.prototype = {
         for(var i = 0; i < this.childNodes.length; i ++){
             this.childNodes[i].parentNode = this;
         }
-    }
+    },
+
+    // 常用的nodeType 常量
+    ELEMENT_NODE: 1,
+    ATTRIBUTE_NODE: 2,
+    TEXT_NODE: 3,
+    COMMENT_NODE: 8,
+    DOCUMENT_NODE: 9,
+    DOCUMENT_TYPE_NODE: 10,
+    DOCUMENT_FRAGMENT_NODE: 11
 };
 
 module.exports = {
