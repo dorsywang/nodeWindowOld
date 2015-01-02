@@ -8,6 +8,7 @@ var document = require("./document");
 var xhr = require("./xhr");
 var fs = require("fs");
 var path = require("path");
+var script = process.binding("evals").NodeScript;
 
 
 var window = {
@@ -36,7 +37,7 @@ var window = {
     },
 
     getComputedStyle: function(node){
-        console.log("get style");
+        //console.log("get style");
         return {
             getPropertyValue: function(name){
                 if(name === "display"){
@@ -48,7 +49,6 @@ var window = {
     },
 
     drequire: function(js){
-        var script = process.binding("evals").NodeScript;
         
         var filename = js;
 
@@ -56,9 +56,14 @@ var window = {
 
         var content = fs.readFileSync(filepath, {encoding: "utf-8"});
 
-        console.log(filename);
+        //console.log("require,", filepath);
+        script.runInThisContext(content, filename);
+    },
 
-        script.runInThisContext(content);
+    get fireDragon(){
+        return {
+            version: "0.0.1"
+        };
     }
 };
 

@@ -64,7 +64,7 @@ Element.prototype = {
     },
 
     getAttribute: function(attr){
-        console.log('get attribute', attr);
+        //console.log('get attribute', attr);
         return this[attr];
     },
     setAttribute: function(attr, val){
@@ -143,7 +143,6 @@ Element.prototype = {
 
     // 这里实现有待进一步验证
     getAttributeNode: function(attr){
-        console.log("getAttributeNode", attr, this[attr]);
         return {
             value: this[attr],
             specified: true
@@ -216,11 +215,11 @@ Element.prototype = {
     },
 
     querySelectorAll: function(selector, content){
-        console.log("using queryAll single node:", selector);
+        //console.log("using queryAll single node:", selector);
         var sizzle = require("./../sizzle/sizzle");
         var els =  sizzle(selector, content);
 
-        console.log(els);
+        //console.log(els);
 
         return els;
     },
@@ -247,7 +246,7 @@ Element.prototype = {
 
                 attrArr.push(attrName + "=\"" + this[i] + "\"");
             }else if(i === "style"){
-                console.log('style');
+                //console.log('style');
                 var styleCode = [];
                 for(var i in this.style){
                     styleCode.push(i + ":" + this.style[i]);

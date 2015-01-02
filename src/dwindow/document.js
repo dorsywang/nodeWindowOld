@@ -80,7 +80,7 @@ module.exports = {
     },
 
     getElementsByTagName: function(tagName){
-        console.log("get element by tagName:", tagName);
+        //console.log("get element by tagName:", tagName);
 
         /*
         var item;
@@ -106,7 +106,7 @@ module.exports = {
     },
 
     querySelectorAll: function(selector){
-        console.log("document query: ", selector);
+        //console.log("document query: ", selector);
         //console.log("document querySelector:", selector);
         return [];
     },
