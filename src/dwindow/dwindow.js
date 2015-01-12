@@ -8,6 +8,8 @@ var document = require("./document");
 var xhr = require("./xhr");
 var fs = require("fs");
 var path = require("path");
+var url = require("url");
+var querystring = require("querystring");
 var script = process.binding("evals").NodeScript;
 
 
@@ -48,16 +50,35 @@ var window = {
         };
     },
 
-    drequire: function(js){
-        
-        var filename = js;
+    // 这里require是由script标签触发的
+    drequire: function(filename, callback){
+        var urlpath = url.parse(filename);
+        var search = urlpath.search;
+        var query = querystring.parse((urlpath.search || "").replace(/^\?/, ""));
 
-        var filepath = path.resolve(__basePath, filename);
 
-        var content = fs.readFileSync(filepath, {encoding: "utf-8"});
+        // http请求
+        if(urlpath.hostname){
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", urlpath.href);
+            xhr.onload = function(data){
+                script.runInThisContext(content, filename);
+            };
 
-        //console.log("require,", filepath);
-        script.runInThisContext(content, filename);
+            xhr.send(search);
+
+        // 本地文件
+        }else{
+
+            var filepath = path.resolve(__basePath, urlpath.pathname);
+
+            var content = fs.readFileSync(filepath, {encoding: "utf-8"});
+
+            console.log("require,", filepath);
+            script.runInThisContext(content, filename);
+
+            callback && callback();
+        }
     },
 
     get fireDragon(){

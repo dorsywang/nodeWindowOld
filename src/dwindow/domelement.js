@@ -2,6 +2,8 @@
  * @author dorsywang(314416946@qq.com)
  */
 
+var eventEmitter = require('events').EventEmitter;
+
 
 var emptyFuc = function(returnVal){
     if(returnVal){
@@ -45,6 +47,7 @@ Element.prototype = {
     },
 
     removeChild: function(node){
+        console.log("removeChild", node.tagName);
         for(var i = 0; i < this.childNodes.length; i ++){
             if(this.childNodes[i] === node){
                 this.childNodes.splice(i, 1);
@@ -61,6 +64,35 @@ Element.prototype = {
     },
 
     addEventListener: function(type, handler, isCapture){
+        var emitter;
+        if(this._emitter){
+            emitter = this._emitter;
+        }else{
+            emitter = new eventEmitter();
+            this._emitter = emitter;
+        }
+
+        //console.log('addListener', handler.handleEvent || handler);
+
+        emitter.addListener(type, handler.handleEvent || handler, isCapture);
+    },
+
+    dispatchEvent: function(event){
+        var e = {
+            preventDefault: function(){
+            },
+
+            stopPropagation: function(){
+            },
+
+            target: this,
+
+            srcElement: this
+        };
+
+        if(this._emitter){
+            this._emitter.emit(event.type, e);
+        }
     },
 
     getAttribute: function(attr){
@@ -131,9 +163,13 @@ Element.prototype = {
         }
 
         if(newNode.tagName === "script"){
-            var content = drequire(newNode.src.replace(/\?.*/g, ""));
-            for(var i in content){
-                global[i] = content[i];
+            if(newNode.src){
+                var content = drequire(newNode.src, function(){
+                    newNode.onload && newNode.onload.call(newNode);
+                });
+                for(var i in content){
+                    global[i] = content[i];
+                }
             }
         }
 
@@ -223,6 +259,9 @@ Element.prototype = {
 
         return els;
     },
+
+    scrollTop: 0,
+    clientHeight: 640,
 
 
     get outerHTML(){

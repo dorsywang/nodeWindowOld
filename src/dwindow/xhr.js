@@ -26,7 +26,7 @@ xhr.prototype = {
 
 
         var headers = {
-            cookie: cookie,
+            cookie: global.node_cookie || cookie,
             referer: "http://xiaoqu.qq.com/mobile/index.html"
             
         };
@@ -67,6 +67,8 @@ xhr.prototype = {
                 _this.responseText = body;
 
                 _this.onreadystatechange && _this.onreadystatechange();
+
+                _this.onload && _this.onload(body);
             });
         });
 

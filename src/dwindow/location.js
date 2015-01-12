@@ -1,14 +1,29 @@
 module.exports = function(){
+
     return {
         set hash(value){
         },
 
         get hash(){
-            return "";
+            var req = global.__REQ;
+
+            var originUrl;
+            if(req){
+                originUrl = req.protocol + "://" + req.hostname + req.url;
+            }
+
+            return  (req && req._parsedUrl.hash) || "";
         },
 
         get search(){
-            return "";
+            var req = global.__REQ;
+
+            var originUrl;
+            if(req){
+                originUrl = req.protocol + "://" + req.hostname + req.url;
+            }
+
+            return  (req && req._parsedUrl.search) || "";
         },
 
         set search(val){
@@ -18,7 +33,11 @@ module.exports = function(){
             return "";
         },
 
-        set href(){
+        set href(url){
+            console.log("tring redirect to ", url);
+        },
+
+        replace: function(url){
         }
     };
 }();

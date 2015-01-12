@@ -93,18 +93,43 @@ var parse = function(htmlStr, scopeSpace){
     // 这里只做了 ""  还要加上'
     var attrReg = /([^=\s]+)=(?:"([^\"]*)"|'([^\']*)')/g;
 
+    var selfCloseTagReg = /br|hr|img|link|meta/;
 
     /**
      * 分析元素树
      */
     var tagResult, attrResult, attrsObj;
     var lastIndex = 0;
+
+    // 先检查是不是只有纯文本
+    if(! tagReg.test(htmlStr)){
+        if(textReg.test(htmlStr)){
+           var text = htmlStr;
+
+            if(text){
+                var textNode = new domEle.Element();
+                textNode.nodeType = textNode.TEXT_NODE;
+                textNode.nodeValue = text;
+
+                docTree.push(textNode);
+            }
+        }
+    }
+
+    tagReg.lastIndex = 0;
+
     while(tagResult = tagReg.exec(htmlStr)){
         var isEndTag = tagResult[1] === "/";
         var tagName = tagResult[2];
         // 这里是未分析的属性
         var attrs = tagResult[3].trim();
         var isSelfEnd = 0;
+
+        // 对自封口的标签进行封口
+        if(selfCloseTagReg.test(tagName)){
+            console.log(tagName);
+            isSelfEnd = 1;
+        }
 
         // 检查是不是自封闭的
         if(/\/>/.test(tagResult[0])){
@@ -168,9 +193,11 @@ var parse = function(htmlStr, scopeSpace){
             }
 
             if(tagName === "script"){
-                var content = drequire(attrsObj.src.replace(/\?.*/g, ""));
-                for(var i in content){
-                    global[i] = content[i];
+                if(attrsObj.src){
+                    var content = drequire(attrsObj.src);
+                    for(var i in content){
+                        global[i] = content[i];
+                    }
                 }
             }
 

@@ -1,7 +1,7 @@
 var parse = require("./../parseDom");
 
 var dom = {};
-parse.parse("<div><span><p></p><a></a></span>发是aaaa  </div>", dom);
+parse.parse("aaaaa", dom);
 
 
 // 显示dom tree

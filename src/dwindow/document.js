@@ -55,6 +55,7 @@ module.exports = {
     },
 
     addEventListener: function(event, handler, isCapture){
+        this.documentElement.addEventListener(event, handler, isCapture);
     },
 
 
@@ -117,14 +118,12 @@ module.exports = {
         return new events.Event(type);
     },
 
-    addEventListener: function(type, listener, capturing) {
-    },
 
     removeEventListener: function(type, listener, capturing) {
     },
 
     dispatchEvent: function(event) {
-        return !event._preventDefault;
+        return this.documentElement.dispatchEvent(event);
     },
 
     createDocumentFragment: function(){
@@ -132,6 +131,18 @@ module.exports = {
         node.tagName = "fragment";
 
         return node;
+    },
+
+    get cookie(){
+        if(window.__REQ){
+            var cookie = window.__REQ.headers.cookie;
+            return cookie;
+        }
+
+        return "";
+    },
+
+    set cookie(cookieStr){
     },
 
     DOCUMENT_NODE: 9

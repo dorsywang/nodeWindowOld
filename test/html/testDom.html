@@ -1,0 +1,34 @@
+<div id="my-top-banner">
+</div>
+<!--被page-content包裹-->
+<div id="myLoading" class="my-loading">载入中，请稍候...</div>
+
+<div id="network-error" class="network-error">
+  <div class="wording">网络请求错误<br><a id="error-refresh" href="javascript:;">点击重新加载</a></div>
+</div>
+
+<div id="myContent" class="ui-page-content hide">
+
+  <!--内容模板-->
+  <div class="mybarlistWrapper">
+    <div class="ui-caption my-bar-list-header section-1px" style="display: none !important;">最近访问<!--(<span id="my-bar-list-total"></span>)-->
+      <a href="javascript:void(0)" id="topTips" class="top-tips">
+        <span id="brand-title"></span>
+        <i></i>
+      </a>
+    </div>
+
+    <ul id="myBarList" class="ui-list ui-spliter-ios"></ul>
+    <div id="mybarlist-loading" class="section-1px">载入中，请稍候...</div>
+    <div id="loading-error" class="section-1px hide">网络请求错误<span id="errorCode"></span><br><a id="error-refresh" href="javascript:;">点击重试</a></div>
+
+  </div>
+
+
+  <div id="recommendBarListWrap" class="recommend_tribes">
+    <div class="ui-caption">推荐部落<span class="ui-right more_tribe" style="color: rgb(63,187,233);">更多<i></i></span></div>
+
+    <ul id="recommendBarList" class="ui-list ui-spliter-ios"></ul>
+  </div>
+
+</div>
