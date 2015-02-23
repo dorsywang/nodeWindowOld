@@ -10,7 +10,7 @@ var fs = require("fs");
 var path = require("path");
 var url = require("url");
 var querystring = require("querystring");
-var script = process.binding("evals").NodeScript;
+var vm = require('vm');
 
 
 var window = {
@@ -62,7 +62,7 @@ var window = {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", urlpath.href);
             xhr.onload = function(data){
-                script.runInThisContext(content, filename);
+                vm.runInThisContext(content, filename);
             };
 
             xhr.send(search);
