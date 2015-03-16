@@ -75,7 +75,7 @@ var window = {
             var content = fs.readFileSync(filepath, {encoding: "utf-8"});
 
             console.log("require,", filepath);
-            script.runInThisContext(content, filename);
+            vm.runInThisContext(content, filename);
 
             callback && callback();
         }

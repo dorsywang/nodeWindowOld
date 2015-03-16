@@ -47,7 +47,7 @@ Element.prototype = {
     },
 
     removeChild: function(node){
-        console.log("removeChild", node.tagName);
+        //console.log("removeChild", node.tagName);
         for(var i = 0; i < this.childNodes.length; i ++){
             if(this.childNodes[i] === node){
                 this.childNodes.splice(i, 1);

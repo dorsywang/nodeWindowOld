@@ -7,9 +7,9 @@ var fireDragon = require("./../src/fireDragon");
     */
 
     // 元素块定义
-    /*
     fireDragon.run("./../../dev/index.html");
 
+    /*
     setTimeout(function(){
         fireDragon.run("./../../dev/index.html");
     }, 1000);

@@ -127,7 +127,7 @@ var parse = function(htmlStr, scopeSpace){
 
         // 对自封口的标签进行封口
         if(selfCloseTagReg.test(tagName)){
-            console.log(tagName);
+            //console.log(tagName);
             isSelfEnd = 1;
         }
 

@@ -66,7 +66,7 @@ xhr.prototype = {
                 _this.status = 200;
                 _this.responseText = body;
 
-                _this.onreadystatechange && _this.onreadystatechange();
+                _this.onreadystatechange && _this.onreadystatechange.call(_this, {target: _this});
 
                 _this.onload && _this.onload(body);
             });
