@@ -52,13 +52,16 @@ var window = {
 
     // 这里require是由script标签触发的
     drequire: function(filename, callback){
+        filename = filename.replace("http://pub.idqqimg.com/qqun/xiaoqu/mobile/", "./");
+
+        console.log(filename);
         var urlpath = url.parse(filename);
         var search = urlpath.search;
         var query = querystring.parse((urlpath.search || "").replace(/^\?/, ""));
 
 
         // http请求
-        if(urlpath.hostname){
+        if(urlpath.hostname && urlpath.hostname != "pub.idqqimg.com"){
             var xhr = new XMLHttpRequest();
             xhr.open("GET", urlpath.href);
             xhr.onload = function(data){
@@ -69,7 +72,6 @@ var window = {
 
         // 本地文件
         }else{
-
             var filepath = path.resolve(__basePath, urlpath.pathname);
 
             var content = fs.readFileSync(filepath, {encoding: "utf-8"});

@@ -7,7 +7,7 @@ var fireDragon = require("./../src/fireDragon");
     */
 
     // 元素块定义
-    fireDragon.run("./../../dev/index.html");
+    //fireDragon.run("./../../dist/index.html");
 
     /*
     setTimeout(function(){
@@ -22,7 +22,7 @@ module.exports = function(req, res,next){
     var originUrl = req.protocol + "://" + req.hostname + req.url;
     var startTime = + new Date();
     // 元素块定义
-    fireDragon.run("./../../dev/index.html", req, res);
+    fireDragon.run("./../../module/mobile/index.html", req, res);
 
     var headerSent = 0;
 
