@@ -1929,7 +1929,6 @@ select = Sizzle.select = function( selector, context, results, seed ) {
 	results = results || [];
 
 
-
 	// Try to minimize operations if there is no seed and only one group
 	if ( match.length === 1 ) {
 
@@ -1953,6 +1952,7 @@ select = Sizzle.select = function( selector, context, results, seed ) {
 
 		// Fetch a seed set for right-to-left matching
 		i = matchExpr["needsContext"].test( selector ) ? 0 : tokens.length;
+
 		while ( i-- ) {
 			token = tokens[i];
 

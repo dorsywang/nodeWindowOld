@@ -9,7 +9,7 @@ var fireDragon = require("./../src/fireDragon");
     // 元素块定义
     //fireDragon.run("./../../dist/index.html");
 
-    fireDragon.run("E:\\AppServ\\www\\qunba_trunk\\dev\\index.html");
+    fireDragon.run("E:\\AppServ\\www\\qunba\\dev\\index.html");
     /*
     setTimeout(function(){
         fireDragon.run("./../../dev/index.html");

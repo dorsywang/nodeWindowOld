@@ -106,10 +106,14 @@ module.exports = {
         }
     },
 
+    querySelector: function(selector){
+        return this.documentElement.querySelector(selector);
+    },
+
     querySelectorAll: function(selector){
         //console.log("document query: ", selector);
         //console.log("document querySelector:", selector);
-        return [];
+        return this.documentElement.querySelectorAll(selector);
     },
 
     nodeType: 9,
@@ -143,6 +147,10 @@ module.exports = {
     },
 
     set cookie(cookieStr){
+    },
+
+    get childNodes(){
+        return [this.documentElement];
     },
 
     DOCUMENT_NODE: 9

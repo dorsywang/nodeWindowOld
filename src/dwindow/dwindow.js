@@ -23,6 +23,9 @@ var window = {
         },
 
         getItem: function(){
+        },
+
+        removeItem: function(){
         }
     },
     alert: function(val){
@@ -52,6 +55,9 @@ var window = {
 
     // 这里require是由script标签触发的
     drequire: function(filename, callback){
+        filename = filename.replace("http://pub.idqqimg.com/qqun/xiaoqu/mobile/", "./");
+
+        console.log(filename);
         var urlpath = url.parse(filename);
         var search = urlpath.search;
         var query = querystring.parse((urlpath.search || "").replace(/^\?/, ""));
@@ -69,7 +75,6 @@ var window = {
 
         // 本地文件
         }else{
-
             var filepath = path.resolve(__basePath, urlpath.pathname);
 
             var content = fs.readFileSync(filepath, {encoding: "utf-8"});

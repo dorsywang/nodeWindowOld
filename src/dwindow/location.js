@@ -37,6 +37,10 @@ module.exports = function(){
             console.log("tring redirect to ", url);
         },
 
+        get pathname(){
+            return "";
+        },
+
         replace: function(url){
         }
     };

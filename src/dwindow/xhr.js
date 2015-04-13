@@ -18,6 +18,10 @@ xhr.prototype = {
         return this.responseHeader[name] || "";
     },
 
+    getAllResponseHeaders: function(){
+        return this.responseHeader || "";
+    },
+
     send: function(data){
         var _this = this;
         var u = url.parse(this.url);
@@ -37,11 +41,13 @@ xhr.prototype = {
 
         console.log("xhr send Data", data);
 
+        var urlR = this.url;
+
         var req = http.request({
             host: "localhost",
-            port: 8888,
             headers: headers,
             method: this.method,
+            port: "8888",
             path: this.url
         }, function(res){
 
@@ -65,6 +71,13 @@ xhr.prototype = {
                 _this.readyState = 4;
                 _this.status = 200;
                 _this.responseText = body;
+
+                try{
+                    if((JSON.parse(body)).retcode !== 0){
+                        console.log("error request", urlR, data, body);
+                    }
+                }catch(e){
+                }
 
                 _this.onreadystatechange && _this.onreadystatechange.call(_this, {target: _this});
 

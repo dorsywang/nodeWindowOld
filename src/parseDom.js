@@ -4,6 +4,7 @@
  * 简单的DOM树解析器
  */
 var domEle = require("./dwindow/domelement");
+var vm = require('vm');
 
 /**
  * 树结构
@@ -95,19 +96,32 @@ var parse = function(htmlStr, scopeSpace){
 
     var selfCloseTagReg = /br|hr|img|link|meta/;
 
+    // 可能里面允许出现</div这样的东西的tag
+    var mixableTagReg = /script|code|pre/;
+
+    var getCloseTagReg = function(tagName){
+        var reg = new RegExp("<(\/)(" + tagName + ")()>", "g");
+        reg.type = "mixableTagCloseReg";
+
+        return reg;
+    };
+
     /**
      * 分析元素树
      */
     var tagResult, attrResult, attrsObj;
-    var lastIndex = 0;
+    var lastIndex = 0, lastTagName = "";
+    var text, textNode;
+
+    var currTagReg = tagReg;
 
     // 先检查是不是只有纯文本
-    if(! tagReg.test(htmlStr)){
+    if(! currTagReg.test(htmlStr)){
         if(textReg.test(htmlStr)){
-           var text = htmlStr;
+           text = htmlStr;
 
             if(text){
-                var textNode = new domEle.Element();
+                textNode = new domEle.Element();
                 textNode.nodeType = textNode.TEXT_NODE;
                 textNode.nodeValue = text;
 
@@ -116,9 +130,10 @@ var parse = function(htmlStr, scopeSpace){
         }
     }
 
-    tagReg.lastIndex = 0;
+    currTagReg.lastIndex = 0;
 
-    while(tagResult = tagReg.exec(htmlStr)){
+
+    while(tagResult = currTagReg.exec(htmlStr)){
         var isEndTag = tagResult[1] === "/";
         var tagName = tagResult[2];
         // 这里是未分析的属性
@@ -137,16 +152,20 @@ var parse = function(htmlStr, scopeSpace){
         }
 
         var start = lastIndex;
-        var len = tagReg.lastIndex - tagResult[0].length - start;
+        var len = currTagReg.lastIndex - tagResult[0].length - start;
 
-        var text = htmlStr.substr(start, len);
+        text = htmlStr.substr(start, len);
 
         if(text){
-            var textNode = new domEle.Element();
+            textNode = new domEle.Element();
             textNode.nodeType = textNode.TEXT_NODE;
             textNode.nodeValue = text;
 
             docTree.push(textNode);
+
+            if(textNode.parentNode.tagName === "script"){
+                    vm.runInThisContext(text, "vm");
+            }
         }
 
 
@@ -198,6 +217,7 @@ var parse = function(htmlStr, scopeSpace){
                     for(var i in content){
                         global[i] = content[i];
                     }
+                }else{
                 }
             }
 
@@ -234,17 +254,44 @@ var parse = function(htmlStr, scopeSpace){
             }else{
             }
 
-        }else{
-            // 如果是一个endTag 将一个空结点做为tag的子结点
-            var node = new domEle.Element();
-            node.nodeType = 3;
-            docTree.push(node);
+            lastTagName = tagName;
 
-            // 回溯到该子结点的级别
-            docTree.backUp();
+            //如果一旦发现是script
+            if(mixableTagReg.test(tagName)){
+                var t = getCloseTagReg(tagName);
+                t.lastIndex = currTagReg.lastIndex;
+
+                currTagReg = t;
+            }
+
+        }else{
+            if(isSelfEnd){
+            }else{
+
+                // 如果是一个endTag 将一个空结点做为tag的子结点
+                var node = new domEle.Element();
+                node.nodeType = 3;
+                docTree.push(node);
+
+                // 回溯到该子结点的级别
+                docTree.backUp();
+
+                // 上次是开口 这次是闭口
+                if(currTagReg.type === "mixableTagCloseReg"){
+                    var index = currTagReg.lastIndex;
+
+                    currTagReg = tagReg;
+                    currTagReg.lastIndex = index;
+                }
+
+                lastTagName = "/" + tagName;
+            }
+
+
         }
 
-        lastIndex = tagReg.lastIndex;
+        lastIndex = currTagReg.lastIndex;
+
     }
 
     /**

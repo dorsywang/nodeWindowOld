@@ -202,12 +202,13 @@ Element.prototype = {
 
     getElementsByClassName: function(className){
         var result = [];
+        var classNameReg = new RegExp("(^|\\s+)" + className + "(\\s+|$)");
         if(this.childNodes.length){
             for(var i = 0; i < this.childNodes.length; i ++){
-                if(this.childNodes[i].className == className){
+                if(className.test(this.childNodes[i].className)){
                     result.push(this.childNodes[i]);
                 }
-                result = result.concat(this.childNodes[i].getElementsByClassName(tagName));
+                result = result.concat(this.childNodes[i].getElementsByClassName(className));
             }
 
         }
@@ -221,7 +222,7 @@ Element.prototype = {
         var result = [];
         if(this.childNodes.length){
             for(var i = 0; i < this.childNodes.length; i ++){
-                if(this.childNodes[i].tagName == tagName){
+                if(this.childNodes[i].tagName == tagName || tagName === "*"){
                     result.push(this.childNodes[i]);
                 }
                 result = result.concat(this.childNodes[i].getElementsByTagName(tagName));
@@ -255,9 +256,38 @@ Element.prototype = {
         var sizzle = require("./../sizzle/sizzle");
         var els =  sizzle(selector, content);
 
+        //console.log(els, 'selectorAll');
+
         //console.log(els);
 
         return els;
+    },
+
+    contains: function(node){
+        var flag = 0;
+        for(var i = 0; i < this.childNodes.length; i ++){
+            var child = this.childNodes[i];
+
+            if(child === node){
+                flag = 1;
+            }else{
+                child.contains(node);
+            }
+        }
+
+        return flag;
+    },
+
+    compareDocumentPosition: function(node){
+        function comparePosition(a, b){ 
+            ( a != b && a.contains(b) && 16 ) + 
+            ( a != b && b.contains(a) && 8 ) + 
+            ( a.sourceIndex >= 0 && b.sourceIndex >= 0 ? 
+            (a.sourceIndex < b.sourceIndex && 4 ) + 
+            (a.sourceIndex > b.sourceIndex && 2 ) : 
+            1 );
+        } 
+            
     },
 
     scrollTop: 0,
@@ -266,6 +296,10 @@ Element.prototype = {
 
     get outerHTML(){
         var tagName = this.tagName;
+        var selfCloseTagReg = /br|hr|img|link|meta/;
+
+        var isSelfEnd = selfCloseTagReg.test(tagName);
+
         if(this.nodeType === 3 || ! tagName){
             return this.nodeValue || "";
         }
@@ -286,7 +320,7 @@ Element.prototype = {
                 attrArr.push(attrName + "=\"" + this[i] + "\"");
             }else if(i === "style"){
                 //console.log('style');
-                var styleCode = [];
+                var styleCode = [];    var selfCloseTagReg = /br|hr|img|link|meta/;
                 for(var i in this.style){
                     styleCode.push(i + ":" + this.style[i]);
                 }
@@ -301,14 +335,19 @@ Element.prototype = {
             attrStr = " " + attrStr;
         }
         
-        var html = "<" + tagName + attrStr + ">";
-        if(this.childNodes){
-            for(var i = 0; i < this.childNodes.length; i ++){
-                html += this.childNodes[i].outerHTML;
+        var html;
+        if(isSelfEnd){
+            html = "<" + tagName + attrStr + " />";
+        }else{
+            html = "<" + tagName + attrStr + ">";
+            if(this.childNodes){
+                for(var i = 0; i < this.childNodes.length; i ++){
+                    html += this.childNodes[i].outerHTML;
+                }
             }
-        }
 
-        html += "</" + tagName + ">";
+            html += "</" + tagName + ">";
+        }
 
         return html;
     },
