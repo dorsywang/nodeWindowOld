@@ -288,6 +288,18 @@ var parse = function(htmlStr, scopeSpace){
             }
 
 
+
+            // 上次是开口 这次是闭口
+            if(currTagReg.type === "mixableTagCloseReg"){
+                var index = currTagReg.lastIndex;
+
+                currTagReg = tagReg;
+                currTagReg.lastIndex = index;
+            }
+
+            lastTagName = "/" + tagName;
+
+
         }
 
         lastIndex = currTagReg.lastIndex;
