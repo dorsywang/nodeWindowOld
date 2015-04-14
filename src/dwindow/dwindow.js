@@ -64,7 +64,7 @@ var window = {
 
 
         // http请求
-        if(urlpath.hostname && urlpath.hostname != "pub.idqqimg.com"){
+        if(urlpath.hostname){
             var xhr = new XMLHttpRequest();
             xhr.open("GET", urlpath.href);
             xhr.onload = function(data){

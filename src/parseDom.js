@@ -78,6 +78,30 @@ var parse = function(htmlStr, scopeSpace){
 
     htmlStr = htmlStr.replace(commentsReg, "");
 
+    // 对转义字符的处理
+    var escapeCharReg = /\\(.)/g;
+
+    var escapeCount = 0;
+    var escapeCharTable = {
+    };
+
+    // 预处理
+    /*
+    str = str.replace(escapeCharReg, function(result, $1){
+        if(escapeCharTable[$1]){
+        }else{
+            escapeCount ++;
+
+            escapeCharTable[$1] = escapeCount;
+        }
+
+        var index = escapeCharTable[$1];
+
+        var escapeChar = "__fire__" + index;
+
+        return escapeChar;
+    });
+    */
 
     var docTree = new Tree();
 
@@ -86,13 +110,11 @@ var parse = function(htmlStr, scopeSpace){
     var _idMap = docTree._idMap; 
     var _allNode = docTree._allNode;
 
-    var tagReg = /\s*<(\/?)([^>\s]+)([^>]*)>/g;
+    //var tagReg = /\s*<(\/?)([^>\s]+)([^>]*)>/g;
 
-    // 这里的reg要优化
-    //var textReg = /.*(?=<\/?[^>]*>)/g;
-    var textReg = /^[^<]*/g;
-    // 这里只做了 ""  还要加上'
-    var attrReg = /([^=\s]+)=(?:"([^\"]*)"|'([^\']*)')/g;
+     var tagReg = /<([^\s\/>]+)|<(\/)([^\s>]+)>|([^<]+)/g;
+
+    var attrReg = /([^\s=]+)=(?:"([^"]*)"|'([^']*)'|([^\s"']+))|>|\/>/g;
 
     var selfCloseTagReg = /br|hr|img|link|meta/;
 
@@ -100,7 +122,7 @@ var parse = function(htmlStr, scopeSpace){
     var mixableTagReg = /script|code|pre/;
 
     var getCloseTagReg = function(tagName){
-        var reg = new RegExp("<(\/)(" + tagName + ")()>", "g");
+        var reg = new RegExp("</(" + tagName + ")>", "g");
         reg.type = "mixableTagCloseReg";
 
         return reg;
@@ -109,13 +131,14 @@ var parse = function(htmlStr, scopeSpace){
     /**
      * 分析元素树
      */
-    var tagResult, attrResult, attrsObj;
+    var result, attrResult, attrsObj;
     var lastIndex = 0, lastTagName = "";
     var text, textNode;
 
-    var currTagReg = tagReg;
+    var currReg = tagReg;
 
     // 先检查是不是只有纯文本
+    /*
     if(! currTagReg.test(htmlStr)){
         if(textReg.test(htmlStr)){
            text = htmlStr;
@@ -129,30 +152,162 @@ var parse = function(htmlStr, scopeSpace){
             }
         }
     }
+    */
 
-    currTagReg.lastIndex = 0;
+    currReg.lastIndex = 0;
+
+    var currNode, attrsObj = {};
+
+    var setCurrTag = function(tag){
+        lastIndex = currReg.lastIndex;
+
+        currReg = tag;
+        currReg.lastIndex = lastIndex;
+
+    };
+
+    while(result = currReg.exec(htmlStr)){
+        var tagType;
+
+        var tagName = result[1] || result[3];
+        var node;
+
+        // 如果是tag 判断type
+        if(currReg === tagReg){
+            if(result[1]){
+                tagType = "startTag";
+            }else if(result[2] === "/"){
+                tagType = "endTag";
+            }else{
+                tagType = "textTag";
+            }
+        }else if(currReg === attrReg){
+            tagType = "attrs";
+        }else if(currReg.type === "mixableTagCloseReg"){
+            tagType = "mixableTagCloseReg";
+        }
+
+        if(tagType === "startTag"){
+            node = new domEle.Element();
+            node.tagName = tagName;
+            node.nodeType = node.ELEMENT_NODE;
+            
+            if(tagName === "head"){
+                document.head = node;
+            }
+
+            if(tagName === "body"){
+                document.body = node;
+            }
+
+            if(tagName === "html"){
+                document.documentElement = node;
+            }
+
+            currNode = node;
+            attrsObj = {};
+
+            docTree.push(node);
+            _allNode.push(node);
+
+            // 开始进入属性分析进程
+            setCurrTag(attrReg);
+
+        // 属性分析进程
+        }else if(tagType === "attrs"){
+            if(result[0] === ">"){
+                // 开始寻找开始、结束标签
+                setCurrTag(tagReg);
+
+                docTree.goNext();
+
+                // 如果是script等 不在寻找标签
+                if(mixableTagReg.test(currNode.tagName)){
+                    setCurrTag(getCloseTagReg(currNode.tagName));
+                }
+
+            // 自封口了
+            }else if(result[0] === "/>"){
+                // 开始寻找开始、结束标签
+                setCurrTag(tagReg);
+
+            // 这里分析属性
+            }else{
+                var attrName = (result[1] + '').trim();
+                var attrValue = result[2] || result[3] || result[4];
+
+                if(attrName === "class"){
+                    attrName = "className";
+                }else if(attrName === "id"){
+                    _idMap[attrValue] = currNode;
+                }else if(attrName === "src"){
+                    var content = drequire(attrValue);
+                    for(var i in content){
+                        global[i] = content[i];
+                    }
+                }
+
+                attrsObj[attrName] = attrValue;
+                node[attrName] = attrValue;
+            }
+        }else if(tagType === "textTag"){
+            var text = result[4];
+
+            node = new domEle.Element();
+            node.nodeType = 3;
+            node.nodeValue = text;
+
+            docTree.push(node);
+
+            currNode = node;
 
 
-    while(tagResult = currTagReg.exec(htmlStr)){
-        var isEndTag = tagResult[1] === "/";
-        var tagName = tagResult[2];
+        }else if(tagType === "endTag"){
+                // 如果是一个endTag 将一个空结点做为tag的子结点
+                var node = new domEle.Element();
+                node.nodeType = 3;
+                docTree.push(node);
+
+                // 回溯到该子结点的级别
+                docTree.backUp();
+        }else if(tagType === "mixableTagCloseReg"){
+            var start = lastIndex;
+            var len = currReg.lastIndex - result[0].length - start;
+
+            var text = htmlStr.substr(start, len);
+
+            node = new domEle.Element();
+            node.nodeType = 3;
+            node.nodeValue = text;
+
+            docTree.push(node);
+
+            if(node.parentNode.tagName === "script"){
+              if(node.parentNode.type && (node.parentNode.type + '').toLowerCase() !== "text/javascript"){
+                }else{
+                    console.log(text);
+                    vm.runInThisContext(text, "vm");
+                }
+            }
+
+            currNode = node;
+
+            docTree.backUp();
+
+            setCurrTag(tagReg);
+        }
+
+
+/*
+
         // 这里是未分析的属性
         var attrs = tagResult[3].trim();
-        var isSelfEnd = 0;
 
-        // 对自封口的标签进行封口
-        if(selfCloseTagReg.test(tagName)){
-            //console.log(tagName);
-            isSelfEnd = 1;
-        }
 
         // 检查是不是自封闭的
         if(/\/>/.test(tagResult[0])){
             isSelfEnd = 1;
         }
-
-        var start = lastIndex;
-        var len = currTagReg.lastIndex - tagResult[0].length - start;
 
         text = htmlStr.substr(start, len);
 
@@ -164,7 +319,11 @@ var parse = function(htmlStr, scopeSpace){
             docTree.push(textNode);
 
             if(textNode.parentNode.tagName === "script"){
+
+                if(textNode.parentNode.type && (textNode.parentNode.type + '').toLowerCase() !== "text/javascript"){
+                }else{
                     vm.runInThisContext(text, "vm");
+                }
             }
         }
 
@@ -227,7 +386,6 @@ var parse = function(htmlStr, scopeSpace){
                 // 走向子结点
                 docTree.goNext();
 
-                /*
                 textReg.lastIndex = tagReg.lastIndex;
 
                 // 查找文字节点
@@ -249,7 +407,6 @@ var parse = function(htmlStr, scopeSpace){
 
                 console.log(textReg.lastIndex);
                 textReg.lastIndex > 0 && (tagReg.lastIndex = textReg.lastIndex);
-                */
 
             }else{
             }
@@ -288,21 +445,17 @@ var parse = function(htmlStr, scopeSpace){
             }
 
 
-
-            // 上次是开口 这次是闭口
-            if(currTagReg.type === "mixableTagCloseReg"){
-                var index = currTagReg.lastIndex;
-
-                currTagReg = tagReg;
-                currTagReg.lastIndex = index;
-            }
-
-            lastTagName = "/" + tagName;
-
-
         }
 
         lastIndex = currTagReg.lastIndex;
+
+        if(tagType === "startTag"){
+            lastIndex = currReg.lastIndex;
+
+            currReg = attrReg;
+            currReg.lastIndex = lastIndex;
+        }
+        */
 
     }
 

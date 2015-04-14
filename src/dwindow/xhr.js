@@ -39,7 +39,7 @@ xhr.prototype = {
             headers['Content-Type'] = "application/x-www-form-urlencoded";
         }
 
-        console.log("xhr send Data", data);
+        //console.log("xhr send Data", data);
 
         var urlR = this.url;
 
