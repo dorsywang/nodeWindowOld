@@ -5,6 +5,8 @@ var domEle = require("./domelement");
 
 var events = {};
 
+
+
 events.Event = function(eventType) {
     this._eventType = eventType;
     this._type = null;

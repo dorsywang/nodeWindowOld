@@ -216,10 +216,25 @@ var parse = function(htmlStr, scopeSpace){
         // 属性分析进程
         }else if(tagType === "attrs"){
             if(result[0] === ">"){
+                if(currNode.getAttribute('type') && (currNode.getAttribute("type") + '').toLowerCase() !== "text/javascript"){
+                }else{
+                    if(currNode.getAttribute("src")){
+                        var attrValue = currNode.getAttribute("src");
+                        var content = drequire(attrValue);
+                        for(var i in content){
+                            global[i] = content[i];
+                        }
+                    }
+                }
+
                 // 开始寻找开始、结束标签
                 setCurrTag(tagReg);
 
-                docTree.goNext();
+                // 属于自封口的是不会继续深入的
+                if(selfCloseTagReg.test(currNode.tagName)){
+                }else{
+                    docTree.goNext();
+                }
 
                 // 如果是script等 不在寻找标签
                 if(mixableTagReg.test(currNode.tagName)){
@@ -240,22 +255,16 @@ var parse = function(htmlStr, scopeSpace){
                     attrName = "className";
                 }else if(attrName === "id"){
                     _idMap[attrValue] = currNode;
-                }else if(attrName === "src"){
-                    var content = drequire(attrValue);
-                    for(var i in content){
-                        global[i] = content[i];
-                    }
                 }
 
-                attrsObj[attrName] = attrValue;
-                node[attrName] = attrValue;
+                node.setAttribute(attrName, attrValue);
             }
         }else if(tagType === "textTag"){
             var text = result[4];
 
             node = new domEle.Element();
             node.nodeType = 3;
-            node.nodeValue = text;
+            node.nodeValue = text || '';
 
             docTree.push(node);
 
@@ -263,13 +272,20 @@ var parse = function(htmlStr, scopeSpace){
 
 
         }else if(tagType === "endTag"){
+                
                 // 如果是一个endTag 将一个空结点做为tag的子结点
                 var node = new domEle.Element();
                 node.nodeType = 3;
+                node.nodeValue = '';
                 docTree.push(node);
 
+                // 自封口没有深入 也不会回溯
+                if(selfCloseTagReg.test(currNode.tagName)){
+
                 // 回溯到该子结点的级别
-                docTree.backUp();
+                }else{
+                    docTree.backUp();
+                }
         }else if(tagType === "mixableTagCloseReg"){
             var start = lastIndex;
             var len = currReg.lastIndex - result[0].length - start;
@@ -278,14 +294,13 @@ var parse = function(htmlStr, scopeSpace){
 
             node = new domEle.Element();
             node.nodeType = 3;
-            node.nodeValue = text;
+            node.nodeValue = text || '';
 
             docTree.push(node);
 
             if(node.parentNode.tagName === "script"){
-              if(node.parentNode.type && (node.parentNode.type + '').toLowerCase() !== "text/javascript"){
+              if(node.parentNode.getAttribute('type') && (node.parentNode.getAttribute("type") + '').toLowerCase() !== "text/javascript"){
                 }else{
-                    console.log(text);
                     vm.runInThisContext(text, "vm");
                 }
             }

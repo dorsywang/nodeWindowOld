@@ -15,6 +15,10 @@ var fireDragon = require("./../src/fireDragon");
         fireDragon.run("./../../dev/index.html");
     }, 1000);
     */
+        $(document.body).on("complete", function(e){
+            console.log("Triggerd");
+            console.dir(document.getElementsByTagName("head")[0]);
+        });
 module.exports = function(req, res,next){
 	var cookie = req.headers.cookie;
     global.node_cookie = cookie;
@@ -43,6 +47,7 @@ module.exports = function(req, res,next){
 
 
     $(document.body).on("complete", function(e){
+        console.log("Triggerd");
 
         console.log("completeTime:", (+ new Date - startTime));
         if(! headerSent){
@@ -51,11 +56,13 @@ module.exports = function(req, res,next){
 
         headerSent = 1;
 
+        /*
         var script = document.createElement("script");
         script.type = "text/javascript";
         script.innerHTML = "window.usingFireDragon = 1";
 
         document.getElementsByTagName("head")[0].appendChild(script);
+        */
 
         RES.write("<!doctype html>");
         RES.write(document.getElementsByTagName("html")[0].outerHTML);

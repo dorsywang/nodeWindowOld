@@ -4,6 +4,46 @@
 
 var eventEmitter = require('events').EventEmitter;
 
+var copyObject = function(obj){
+    var newObj;
+    if(obj instanceof Array){
+        newObj = [];
+    }else{
+        newObj = {};
+    }
+
+    for(var i in obj){
+        var type = typeof obj[i];
+
+        if(obj.hasOwnProperty(i) && type !== "function"){
+            if(type === 'object'){
+                newObj[i] = copyObject(obj[i]);
+            }else{
+                newObj[i] = obj[i];
+            }
+        }
+    }
+
+    return newObj;
+};
+
+var parseCssText = function(style, val){
+     // 解析css
+     if(val){
+        val = val.split(";");
+
+        val.map(function(item, index){
+            if(item){
+                var exp = item.split(":");
+                var name = exp[0];
+                var v = exp[1] || '';
+
+                style[name] = v;
+            }
+        });
+     }
+
+};
 
 var emptyFuc = function(returnVal){
     if(returnVal){
@@ -15,9 +55,74 @@ var emptyFuc = function(returnVal){
     }
 };
 
+var NamedNodeMap = function(node){
+    this.length = 0;
+    this.ownerElment = node;
+};
+
+NamedNodeMap.prototype = {
+    setNamedItem: function(name, value){
+        var attr = this.getNamedItem(name);
+
+        if(attr){
+            attr.name = name;
+            attr.nodeValue = value || '';
+            attr.value = value || '';
+
+            attr.firstChild.value = value || '';
+            attr.firstChild.nodeValue = value || '';
+        }else{
+
+            this[this.length ++] = {
+                name: name,
+                value: value || '',
+                ownerElment: this.ownerElment,
+                nodeType: Element.prototype.ATTRIBUTE_NODE,
+                nodeValue: value || '',
+                childNodes: function(){
+                    var node = new Element();
+                    node.nodeType = node.TEXT_NODE;
+                    node.value = value || '';
+                    node.nodeValue = value || '';
+
+                    return [node];
+                }(),
+
+                get lastChild(){
+                    return this.childNodes[this.childNodes.length - 1];
+                },
+
+                get firstChild(){
+                    return this.childNodes[0];
+                }
+            };
+        }
+    },
+
+    getNamedItem: function(name){
+        for(var i in this){
+            if(this.hasOwnProperty(i)){
+                var item = this[i];
+
+                if(item.name == name){
+                    return item;
+                }
+            }
+        }
+    }
+};
+
 var Element = function(opt){
     this.childNodes = [];
-    this.style = {};
+
+    var _this = this;
+    this.style = {
+        set cssText(val){
+            parseCssText(_this.style, val);
+        }
+    };
+
+    this.attributes = new NamedNodeMap(this);
 };
 
 Element.prototype = {
@@ -41,6 +146,39 @@ Element.prototype = {
 
     get nodeName(){
         return (this.tagName || "").toUpperCase();
+    },
+
+    get id(){
+        return this.getAttribute('id');
+    },
+
+    set id(id){
+        this.setAttribute(id);
+    },
+
+    get className(){
+        return this.getAttribute('className');
+    },
+
+    set className(val){
+        this.setAttribute('className', val);
+    },
+
+    cloneNode: function(){
+        if(this.nodeType === this.TEXT_NODE){
+            var node = new Element();
+            node.nodeType = this.TEXT_NODE;
+
+            node.nodeValue = this.nodeValue;
+
+            return node;
+        }
+
+        var node = document.createDocumentFragment();
+
+        node.innerHTML = "<" + this.tagName + " " + this._getAttributeString() + "></" + this.tagName + ">";
+
+        return node.childNodes[0];
     },
 
     focus: function(){
@@ -96,11 +234,22 @@ Element.prototype = {
     },
 
     getAttribute: function(attr){
-        //console.log('get attribute', attr);
-        return this[attr];
+        var item = this.attributes.getNamedItem(attr);
+        
+        if(item){
+            return item.value || '';
+        }else{
+            return '';
+        }
     },
     setAttribute: function(attr, val){
-        this[attr] = val;
+        var _this = this;
+
+        if(attr === "style"){
+             parseCssText(this.style, val);
+        }
+
+        this.attributes.setNamedItem(attr, val);
     },
 
     insertBefore: function(newNode, oldNode){
@@ -166,6 +315,9 @@ Element.prototype = {
             if(newNode.src){
                 var content = drequire(newNode.src, function(){
                     newNode.onload && newNode.onload.call(newNode);
+
+                    // 注意这里 把新加的脚本执行后就删除了
+                    newNode.parentNode.removeChild(newNode);
                 });
                 for(var i in content){
                     global[i] = content[i];
@@ -175,6 +327,14 @@ Element.prototype = {
 
         return newNode;
 
+    },
+
+    get src(){
+        return this.getAttribute("src");
+    },
+
+    set src(value){
+        this.setAttribute("src", value);
     },
 
     // 这里实现有待进一步验证
@@ -293,6 +453,45 @@ Element.prototype = {
     scrollTop: 0,
     clientHeight: 640,
 
+    _getAttributeString: function(){
+        var attrArr = [];
+
+        for(var i in this.attributes){
+            if(this.attributes[i].nodeType && this.attributes[i].nodeType === this.ATTRIBUTE_NODE){
+                var attrName = this.attributes[i].name;
+                if(attrName === "className"){
+                    attrName = 'class';
+                }
+
+                if(attrName === "style"){
+                    continue;
+                }
+
+                attrArr.push(attrName + "=\"" + (this.attributes[i].value || '') + "\"");
+            }
+            
+        }
+
+        //console.log('style');
+        var styleCode = []; 
+        for(var i in this.style){
+            if(this.style[i]){
+                styleCode.push(i + ":" + this.style[i]);
+            }
+        }
+
+        if(styleCode.length){
+            attrArr.push("style=\"" + styleCode.join(";") + "\"");
+        }
+
+        var attrStr = attrArr.join(" ");
+        if(attrStr){
+            attrStr = " " + attrStr;
+        }
+        
+        return attrStr;
+    },
+
 
     get outerHTML(){
         var tagName = this.tagName;
@@ -304,37 +503,9 @@ Element.prototype = {
             return this.nodeValue || "";
         }
 
-        var attrArr = [];
+        var attrStr = this._getAttributeString();
 
-        for(var i in this){
-            if(this.hasOwnProperty(i) && (typeof this[i] === "string" || typeof this[i] === "number" || typeof this[i] === "boolean")){
-                if(i === "tagName" || i === "nodeType"){
-                    continue;
-                }
 
-                var attrName = i;
-                if(i === "className"){
-                    attrName = 'class';
-                }
-
-                attrArr.push(attrName + "=\"" + this[i] + "\"");
-            }else if(i === "style"){
-                //console.log('style');
-                var styleCode = [];    var selfCloseTagReg = /br|hr|img|link|meta/;
-                for(var i in this.style){
-                    styleCode.push(i + ":" + this.style[i]);
-                }
-                if(styleCode.length){
-                    attrArr.push("style=\"" + styleCode.join(";") + "\"");
-                }
-            }
-        }
-
-        var attrStr = attrArr.join(" ");
-        if(attrStr){
-            attrStr = " " + attrStr;
-        }
-        
         var html;
         if(isSelfEnd){
             html = "<" + tagName + attrStr + " />";

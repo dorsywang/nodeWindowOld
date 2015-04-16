@@ -26,7 +26,7 @@ xhr.prototype = {
         var _this = this;
         var u = url.parse(this.url);
 
-        var cookie =  "_ga=GA1.2.1928717429.1387360419; RK=aenukl/0Mr; pgv_pvid=7910403600; o_cookie=314416946; pgv_pvi=159959040; ptui_loginuin=honghu91@hotmail.com; pt2gguin=o0314416946; uin=o0314416946; skey=@hYUs9GpX7; ptisp=ctc; ptcz=d941743d45947fc7677d8d66b3a54da91851b6cf957c95fbef7c8a4992787d00";
+        var cookie =  "ptui_loginuin=honghu91@hotmail.com; pgv_pvi=2302861312; o_cookie=314416946; pgv_si=s857558016; pgv_info=ssid=s6836340495; pgv_pvid=3111206016; _ga=GA1.2.1928717429.1387360419; pt_clientip=bcd90e11162c86f1; pt_serverip=10e50a8259673ce0; pt2gguin=o0314416946; uin=o0314416946; skey=@GBtrFgdA4; ptisp=ctc; RK=aenu1l/ccr; ptcz=ace605c7a7c21109309760cb5896d1898c9a50685570d214d739272dc7f29b01";
 
 
         var headers = {

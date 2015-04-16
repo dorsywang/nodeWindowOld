@@ -1,4 +1,1009 @@
-<div soda-bind-html="'<span>ok</span>'">
-  <div>sadf</div>
-</div>
-<br />
+<!DOCTYPE html>
+<html class=" js-no-overflow-scrolling">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="cache-control" content="max-age=0" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta itemprop="name" content="兴趣部落，总有你喜欢！" />
+<meta itemprop="description" content="点击发现海量精彩内容！" />
+<meta itemprop="image" content="http://pub.idqqimg.com/qqun/xiaoqu/buluo/share/images/logo-share.jpg" />
+<title>兴趣部落</title>
+<script>
+(function() {
+
+    window.pageStartTime = Date.now();
+
+    // 动态入口上报
+    if (location.hash.indexOf('from=dongtai') !== -1) {
+        var img = new Image();
+        img.src = 'http://cgi.pub.qq.com/report/report_vm?monitors=[470838]&t=' + Date.now();
+    }
+
+    if (/debug=8888/.test(window.location.search)) {
+        return;
+    }
+
+    var searchArr = window.location.search.slice(1).split('&'),
+        ua = navigator.userAgent,
+        REGEXP_IOS_QQ = /(iPad|iPhone|iPod).*? (IPad)?QQ\/([\d\.]+)/,
+        REGEXP_ANDROID_QQ = /\bV1_AND_SQI?_([\d\.]+)(.*? QQ\/([\d\.]+))?/,
+        i,
+        index,
+        sid;
+
+
+    if (!/Android|iPhone|iPod|iPad/i.test(navigator.userAgent)) {
+        var url = encodeURIComponent(window.location.href);
+        location.replace('http://buluo.qq.com/share/index.html?url=' + url);
+        return;
+    }
+
+    if (REGEXP_IOS_QQ.test(ua) || REGEXP_ANDROID_QQ.test(ua)) {
+        return;
+    }
+    for (i = searchArr.length; i--;) {
+        index = searchArr[i].indexOf('sid=');
+        if (index !== -1) {
+            sid = searchArr[i].slice(4);
+            if (sid) {
+                document.cookie = 'vkey=' + decodeURIComponent(sid) + '; path=/;';
+                searchArr.splice(i, 1);
+                location.replace('http://xiaoqu.qq.com' + location.pathname + '?' + searchArr.join('&') + location.hash);
+                return;
+            }
+        }
+    }
+})();
+</script>
+<script>
+(function() {
+    function getQueryParam(param) {
+        var r = new RegExp("(\\?|#|&)" + param + "=([^&#]*)(&|#|$)"),
+            m = location.href.match(r);
+        return decodeURIComponent(!m ? "" : m[2]);
+    }
+
+    function getHash(n) {
+        var m = window.location.hash.match(new RegExp("(?:#|&)" + n + "=([^&]*)(&|$)"));
+        return !m ? "" : decodeURIComponent(m[1]);
+    }
+
+    function vaildURL(sUrl) {
+        var l = ['qq', 'tencent', 'soso', 'paipai', 'tenpay', 'yixun', 'wanggou', 'qzone', 'weishi', 'weiyun']; //安全名单
+        var r = new RegExp("^(https?:\\/\\/)?[\\w\\-.]+\\.(" + l.join("|") + ")\\.com($|\\/|\\\\)", "i");
+        return r.test(sUrl) || (/^[\w][\w\/\.\-_%]+$/i).test(sUrl) || (/^[\/\\][^\/\\]/i).test(sUrl) ? true : false;
+    }
+    var bid = getQueryParam('barid');
+    var jumpPage = getHash('jump_page') || getQueryParam('jump_page');
+    var isAndroid = navigator.userAgent.indexOf("Android") > -1;
+    var isQQBrowser = navigator.userAgent.match(/MQQBrowser\/([\d.]+)/);
+
+    if (bid || jumpPage) {
+        var from = getQueryParam('from');
+        var offId = getQueryParam('_bid') || 128;
+        var wv = getQueryParam('_wv');
+        var flag;
+        try {
+            flag = localStorage.getItem('card-open');
+        } catch (e) {}
+        if (isQQBrowser && isQQBrowser[1] < '5.4') {
+            // qq浏览器5.4一下版本(不含5.4)不会产生空白页面, 所以在有qq浏览器的手机上, 这里跳转之后会直接后退的
+            flag = 0;
+            localStorage.removeItem('card-open');
+        }
+        if (flag == 1) {
+            localStorage.removeItem('card-open');
+        } else if (jumpPage) {
+            if (vaildURL(jumpPage)) {
+                if (isAndroid) {
+                    location.href = jumpPage;
+                } else {
+                    location.replace(jumpPage);
+                }
+            }
+        } else if (bid) {
+            if (isAndroid) {
+                location.href = "http://xiaoqu.qq.com/mobile/barindex.html?_bid=" + offId + "&_wv=" + wv + "#bid=" + bid + '&from=' + from;
+            } else {
+                location.replace("http://xiaoqu.qq.com/mobile/barindex.html?_bid=" + offId + "&_wv=" + wv + "#bid=" + bid + '&from=' + from);
+            }
+        }
+    }
+})();
+
+</script>
+<link rel="stylesheet" href="css/base.min.css"/>
+<link media="all" rel="stylesheet" href="css/index.min.css" type="text/css" />
+</head>
+<body class="ui-app" id="js_bar_main">
+
+  <div class="search" id="search">
+      <div class="personal-card j-personal" data-url="personal"></div>
+      <div id="myTabMsg" class="personal-msg j-personal" data-url="my_related" data-hash="">
+          <label class="msg-number"></label>
+      </div>
+    <div class="pollkit ani">
+      <form  id="searchTribe">
+        <input placeholder="搜索部落或话题" name="searchWord" id="searchWord" />
+      </form>
+      <span class="clear"></span>
+      <span class="cancelSearch">取消</span>
+    </div>
+  </div>
+<div class="ui-bottom-bar index-tab hide fixedTab"> <!-- tabindex="0" 在android上会触发一个高亮边框 -->
+  <!-- 头部Tab -->
+    <div class="nav-wrap section-1px" id="navWrap">
+        <a class="nav-item discover">
+            <span class="ui-label">动态</span>
+        </a>
+        <a class="nav-item recentVisited">
+            <span class="ui-label">最近</span>
+        </a>
+        <a class="nav-item rank">
+            <span class="ui-label">排行</span>
+        </a>
+        <a class="nav-item around">
+            <span class="ui-label">附近</span>
+        </a>
+        <a class="nav-item cate-anime">
+            <span class="ui-label">动漫</span>
+        </a>
+        <a class="nav-item cate-xing">
+            <span class="ui-label">星座</span>
+        </a>
+        <a class="nav-item cate-picture">
+            <span class="ui-label">自拍</span>
+        </a>
+        <a class="nav-item cate-fun">
+            <span class="ui-label">搞笑</span>
+        </a>
+        <a class="nav-item cate-emotion">
+            <span class="ui-label">情感</span>
+        </a>
+        <a class="nav-item cate-star">
+            <span class="ui-label">明星</span>
+        </a>
+        <a class="nav-item cate-game">
+            <span class="ui-label">游戏</span>
+        </a>
+    </div>
+    <span class="filter-left"></span><span class="filter-right"></span>
+    <!-- /头部Tab-->
+</div>
+<!--切换底部导航的容器Page-->
+
+<div class="ui-page searchPage">
+  <div class="searchContent ui-page-content">
+      <div class="labels"></div>
+      <div class="loading spinner search-loading ui-hide">载入中，请稍候...</div>
+      <div class="searchResult list-section ui-hide" id="searchGbarResult"></div>
+      <div class="searchResult list-section section-1px topic ui-hide" id="searchTopicResult">
+          <div class="searchTitle resultTitle section-2px">话题</div>
+          <ul class="more-buluo category-list" id="topicResultUl"></ul>
+          <div class="sub-load-more border-1px">上拉加载更多</div>
+      </div>
+      <div class="searchResult list-section section-1px user-result ui-hide" id="searchUserResult"></div>
+      <div class="searchResult list-section border-1px ui-hide" id="subSearchResultWrap">
+          <div class="searchTitle resultTitle section-1px" id="subSearchResultTitle">
+              <span class="srt-title"></span><span class="srt-num"></span>
+          </div>
+          <ul class="category-list" id="subSearchResult">
+              <li class="js-bar tribes no-tribe-match hide"><div><div class="i-create-tribe"></div><p class="create-tip">申请创建<span>XXXX</span>>部落</p></div></li>
+          </ul>
+          <div class="sub-load-more border-1px">上拉加载更多</div>
+      </div>
+    <div class="searchResult list-section ui-hide" id="noSearchResult">
+      <div class="noResult">
+        <div class="tips">没有找到“<span class="keyword-match" id="nokw"></span>”相关内容</div>
+        <div class="button" id="btnct">申请创建该部落</div>
+      </div>
+    </div>
+    <div class="hotTribes list-section hide" id="hotTribes">
+
+      <div class="searchTitle">
+         热门部落
+         <div class="ui-right more_tribe">更多</div>
+      </div>
+      <ul class="more-buluo border-1px category-list hotList">
+      </ul>
+        <!--<div class="search-apply-tribe">
+            申请创建部落
+        </div>-->
+    </div>
+
+  </div>
+
+</div>
+<div class="page1 ui-page"></div>
+<div class="page2 ui-page page-recover" id="recoverPage"></div>
+<div class="page3 ui-page page-category" id="categoryPage"></div>
+<div class="page4 ui-page page-around" id="aroundPage"></div>
+<div class="ui-page page-cate" id="game-tab"></div>
+<div class="ui-page page-cate" id="star-tab"></div>
+<div class="ui-page page-cate" id="emotion-tab"></div>
+<div class="ui-page page-cate" id="fun-tab"></div>
+<div class="ui-page page-cate" id="picture-tab"></div>
+<div class="ui-page page-cate" id="anime-tab"></div>
+<div class="ui-page page-cate" id="xing-tab"></div>
+
+<script>
+/**
+ * LOG使用方法
+ * 引入：在需要使用log的页面引入<script src="js/common/log.js?__inline"><\/script>放置在body底部的第一个例如index.html
+ * 开关：openLog 这个字段存在localStorage里面，目前是写死的打开，关于界面上怎么交互来打开还需要讨论
+ * 引入和开关都完成时候就可以使用了，直接用console.log来打印log，级别分为["DEBUG", "LOG", "INFO", "WARN", "ERROR"];分别对应不同的方法例如console.error
+ * 目前在model和index的部分逻辑添加了log，在badjs的onerror方法里面也添加了出错的console.error
+ * 
+ */
+
+ var _url = function(url){
+     return url;
+ };
+(function (root, factory) {
+
+    root['MLogger'] = factory();
+}(this, function () {
+    
+    var option = {
+        'useLogLine' : false,
+        'logExtJs' : 'js/log.min.js',
+        'logExtCss' : 'css/log.min.css'
+    };
+
+    
+    //日志级别
+    var LOG_LEVELS = [
+        "DEBUG",
+        "LOG",
+        "INFO",
+        "REPORT",
+        "ERROR"
+    ];
+    window.Logger = {
+        'data' : {}
+    };
+    window.Logger.data.IS_CONSOLE_OPEN = false;
+    window.Logger.data.CONSOLE_LOG_ARR = [];
+
+    // 展示UI前将log信息存入内存
+    var saveLog = function(log){
+        window.Logger.data.CONSOLE_LOG_ARR.push(log);
+    };
+
+    // 解析log坐在脚本与行号
+    // var getConsoleLocation = function() {
+    //     try {
+    //         throw new Error();
+    //     }catch(e){
+    //         if(!e.stack) {
+    //             return '';
+    //         }
+    //         var arr = e.stack.replace(/Error\n/).split(/\n/);
+    //         arr = arr[6].replace(/^\s+|\s+$/, "").split('/');
+    //         var lineArr = arr[arr.length-1].split(':');
+    //         var fileArr = lineArr[0].split('.');
+    //         return fileArr[0] + '.js ' + lineArr[1];
+    //     }
+    // };
+
+    
+    /**
+     * 自定义日志对象
+     * @type {{DELIMITER: string, _record: _record, log: log, info: info, error: error}}
+     */
+    var _Console = {
+        _record: function(logLevel) {
+            var location = '';
+
+            var log = {
+                "level": logLevel, //日志级别
+                "time": Date.now(), //日志时间，时间戳
+                "location" : location
+            };
+
+            var content = []; //日志内容
+
+            for (var i = 1; i < arguments.length; i++) {
+                try {
+                    //var innerContent = [];
+                    content.push(arguments[i]);
+                    //content += (i === 1 ? "" : _Console.DELIMITER) + JSON.stringify(arguments[i]);
+                }catch(e) {
+                    content.push(arguments[i]);
+                    //content += (i === 1 ? "" : _Console.DELIMITER) + arguments[i];
+                }
+            }
+
+            log["content"] = content;
+            reportLog(content,logLevel);
+            if (logLevel !== 'REPORT') {
+                if(window.Logger.data.IS_CONSOLE_OPEN){
+                    window.Logger.Console.renderLog(log, true);
+                } else {
+                    saveLog(log);
+                }
+            }
+            
+        },
+        log: function() {
+            Array.prototype.unshift.call(arguments, LOG_LEVELS[1]);
+            _Console._record.apply(_Console, arguments);
+        },
+        info: function() {
+            Array.prototype.unshift.call(arguments, LOG_LEVELS[2]);
+            _Console._record.apply(_Console, arguments);
+        },
+        report: function() {
+            Array.prototype.unshift.call(arguments, LOG_LEVELS[3]);
+            _Console._record.apply(_Console, arguments);
+        },
+        error: function() {
+            Array.prototype.unshift.call(arguments, LOG_LEVELS[4]);
+            _Console._record.apply(_Console, arguments);
+        }
+    };
+    var extendMyObj = function(){
+        window.Logger.data.reportCount = 0;
+        window.Logger.data.reportArr = [];
+        window.Logger.data.cgiArr = [];
+        var myopen = window.XMLHttpRequest.prototype.open;
+        window.XMLHttpRequest.prototype.open = function(){
+            var _arguments = arguments;
+            var temp = this.onreadystatechange;
+            this.start = Date.now();
+            this.onreadystatechange = function(e){
+                
+                if (e.target.readyState == 4) {
+                    
+                    var obj = {
+                        'url' : _arguments[1],
+                        'time' : Date.now() - e.target.start,
+                        'text' : e.target.responseText, //e.target.responseText
+                        'status' : e.target.status,
+                        'headers' : e.target.getAllResponseHeaders(),
+                        'params' : _arguments[1]
+                    };
+                    
+                    delete e.target.start;
+                    window.Logger.data.cgiArr.push(obj);
+                }
+                return temp.apply(this,arguments);
+            };
+            
+            return myopen.apply(this,arguments);
+        };
+        
+        // try{
+        //     var myimage = window.Image;
+            
+        //     window.Image = function(){
+        //         var image = new myimage();
+        //         var image2 = new myimage();
+                
+        //         Object.defineProperty(image,'src',{
+        //             set:function(newValue){
+        //                 image2.src = newValue;
+        //                 var arr = ['http://isdspeed.qq.com/cgi-bin/r.cgi?','http://cgi.connect.qq.com/report/report_vm?','http://xiaoqu.qq.com/cgi-bin/bar/tdw/report?','http://wspeed.qq.com/w.cgi?'];
+        //                 for (var i = 0 ; i < arr.length ; i++) {
+        //                     if (newValue.indexOf(arr[i]) > -1) {
+        //                         reportCount++;
+        //                         reportArr.push(newValue);
+        //                     }
+        //                 }
+        //             }
+        //         });
+
+        //         return image;
+        //     }
+        // }catch(e){
+        //     window.Image = myimage;
+        // }
+
+    };
+
+    var _extendObj = function(obj) {
+        if (typeof obj !== 'object'){
+            return obj;
+        }
+        var source, prop;
+        for (var i = 1, len = arguments.length; i < len; i++) {
+            source = arguments[i];
+            for (prop in source) {
+                if (source.hasOwnProperty(prop)) {
+                    // 不覆盖原方法执行，只是加个壳
+                    (function(obj, prop) {
+                        if (typeof obj[prop] === "function") {
+                            var oldFun = obj[prop];
+                            obj[prop] = function() {
+                                source[prop].apply(source, arguments);
+                                oldFun.apply(obj, arguments);
+                            };
+                        } else {
+                            obj[prop] = source[prop];
+                        }
+                    })(obj, prop);
+                }
+            }
+        }
+        return obj;
+    };
+    var firstLoad = true;
+    var secondLoad = false;
+    var loadLogResource = function(){
+        if (firstLoad) {
+            firstLoad = false;
+            var html = "<div id='log-preload' class='log-preload slideLeft'><p>启用log?</p><div><div class='btn' id='yesLog'>yes</div><div class='btn' id='noLog'>no</div></div></div>";
+            var div = document.createElement('div');
+            div.innerHTML = html;
+            document.body.appendChild(div);
+            document.getElementById('yesLog').addEventListener('touchstart', function(){
+                document.getElementById('log-preload').innerHTML = "<div class='spinner'></div>";
+                var script = document.createElement('script');
+                script.src = option.logExtJs;
+                window.Logger.data.LOG_CSS_URL = option.logExtCss;
+                document.body.appendChild(script);
+                script.onload = function(){
+                    secondLoad = true;
+                    window.Logger.Console.createLog();
+                };
+            });
+            document.getElementById('noLog').addEventListener('touchstart', function(){
+                document.getElementById('log-preload').style.display = 'none';
+            });
+        } else {
+            if (secondLoad) {
+                secondLoad = true;
+                window.Logger.Console.createLog();
+            } else {
+                document.getElementById('log-preload').style.display = 'block';
+            }
+        }
+    };
+
+    var triggerLog = function(callback){
+        var first = {x:0,y:document.documentElement.clientHeight};
+        var second = {x:document.documentElement.clientWidth/2,y:0};
+        var third = {x:document.documentElement.clientWidth,y:document.documentElement.clientHeight};
+        var flag1;
+        var flag2;
+        var distance = 50;
+
+        document.addEventListener('touchmove', function(e){
+
+            if (flag1 && Math.abs(e.targetTouches[0].clientX - second.x) < distance && Math.abs(e.targetTouches[0].clientY - second.y) < distance ) {
+                flag2 = true;
+            }
+            if (flag2 && Math.abs(e.targetTouches[0].clientX - third.x) < distance && Math.abs(e.targetTouches[0].clientY - third.y) < distance ) {
+
+                callback();
+                flag1 = flag2 = false;
+            }
+        });
+        document.addEventListener('touchend', function(){
+            flag1 = flag2 = false;
+        });
+        document.addEventListener('touchstart', function(e){
+            flag1 = flag2 = false;
+            if (Math.abs(e.targetTouches[0].clientX - first.x) < distance && Math.abs(e.targetTouches[0].clientY - first.y) < distance ) {
+                flag1 = true;
+            }
+        });
+    };
+    
+
+    // 绑定Log呼出逻辑
+    // var timer;
+    // document.body.addEventListener('touchstart', function(e){
+    //     timer = setTimeout(function(){
+    //         if(window.Console){
+    //             window.Console.createLog();
+    //         } else {
+    //             // report
+    //         }
+    //         e.stopPropagation();
+    //     }, 3000);
+    // }, false);
+    // document.body.addEventListener('touchend', function(){
+    //     clearTimeout(timer);
+    // }, false);
+      var Ajax = function(){
+              function request(url,opt){
+                  function fn(){}
+                  var async   = opt.async !== false,
+                      method  = opt.method    || 'GET',
+                      data    = opt.data      || null,
+                      success = opt.success   || fn,
+                      failure = opt.failure   || fn;
+                      method  = method.toUpperCase();
+                  if(method == 'GET' && data){
+                      url += (url.indexOf('?') == -1 ? '?' : '&') + data;
+                      data = null;
+                  }
+                  var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+                  xhr.onreadystatechange = function(){
+                      _onStateChange(xhr,success,failure);
+                  };
+                  xhr.open(method,url,async);
+                  if(method == 'POST'){
+                      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded;');
+                  }
+                  xhr.send(data);
+                  return xhr;
+              }
+              function _onStateChange(xhr,success,failure){
+                  if(xhr.readyState == 4){
+                      var s = xhr.status;
+                      if(s>= 200 && s < 300){
+                          success(xhr);
+                      }else{
+                          failure(xhr);
+                      }
+                  }else{}
+              }
+              return {request:request};  
+    }();
+
+    var checkWrightList = function(){
+        Ajax.request('http://xiaoqu.qq.com/bmd/check',{
+                success : function(xhr){
+                    
+                    var obj = JSON.parse(xhr.responseText);
+                    if (obj.ret == 0) {
+                        window.Logger.data.isReport = true;
+                        window.Logger.data.reportId = obj.id;
+                    }
+                    
+                }
+            }
+        );
+        
+    };
+
+    //checkWrightList();
+    var reportLog = function(content,level){
+
+        if (window.Logger.data.isReport && level == 'REPORT') {
+            //content
+            var id = window.Logger.data.reportId;
+            var t = Date.now();
+            debugger;
+            //new Image().src = 'http://xiaoqu.qq.com/bmd/report?id='+id+'&t='+t+'&l='+content[0].type+'&c='+content[0].content
+        }
+    };
+    
+    
+    var init = function(opt){
+        option.useLogLine = opt.useLogLine || false;
+        option.logExtJs = opt.logExtJs || _url('js/log.min.js');
+        option.logExtCss = opt.logExtCss || _url('css/log.min.css');
+        option.triggerLog = opt.triggerLog || triggerLog;
+        option.beforeInit = opt.beforeInit || function(){};
+        option.myEvent = opt.myEvent || function(){};
+        option.widgetList = opt.widgetList || ['location','env','cgi'];//'cookie',
+        option.myWidget = opt.myWidget || [{ 
+            'getHtml' : function(){}
+        }];
+        option.myButton = opt.myButton || [{
+            'getHtml' : function(){}
+        }];
+        option.beforeInit();
+        
+
+        //将自定义的日志API覆盖到原生console中
+        
+        _extendObj(window.console, _Console);
+        
+        //拦截ajax
+        extendMyObj();
+        window.addEventListener('load',function(){
+            window.Logger.data.onloadTime = Date.now() - window.pageStartTime;
+        })
+        option.triggerLog(function(){
+            
+            loadLogResource();
+            
+        });
+        window.Logger.data.LoggerOption = option;
+        
+    };
+
+    init({});
+    
+    return {
+        'init' : init
+    };
+}));
+</script>
+<script>
+/**
+ * @author herbertliu
+ * @date 2013-02-25
+ * @description badjs上报
+ * @param msg {String} 上报错误信息
+ * @param url {String} 该上报信息所属的文件路径
+ * @param line {Number} 上报信息所属的文件行号，没有为0
+ * @param smid {Number} 上报对应的monitor id,如果smid ===0 ,则只统计badjs,不上报monitor;如果没有该参数，则上报通用monitor id;如果smid === -1，window.onerror专用，会增加Script Error字段头
+ * @param level {Number} 上报对应的级别 debug（调试日志）：1 ; info（流水日志）：2 ; error（错误日志）：4（默认值） ; fail（致命错误日志）：8
+ * @example Badjs.init(bid,mid,smid,closed) 初始化badjs一些参数
+ * @example Badjs.check(o,mid)  检查页面是否存在某些文件辅助方法
+ * @example Badjs.info(type)  获取badjs上报的头信息字符串，其中type为类型，不同的类型上报采用不同的字符串
+ * @example Badjs.report(retry,total,src,name,loaded)  文件加载失败的辅助上报方法
+ */
+
+;
+(function() {
+    var global = this || window;
+    global.Badjs = (function() {
+        var badjs = function(msg, url, line, smid, level, monitorId) {
+            var mid = badjs._mid || 195375;
+            var bid = badjs._bid || 102;
+
+            monitorId = monitorId || 447770;
+
+            if (smid > 0 || smid === 0) {
+                mid = smid;
+            } else if (smid === -1) { //window onerror事件处理，增加Script Error前缀
+                msg = 'Script Error:' + msg;
+            }
+
+            level = level || 4; //默认值
+            if (!badjs._closed) {
+                var img1 = new Image();
+                img1.src = 'http://badjs.qq.com/cgi-bin/js_report?level=' + level + '&bid=' + bid + (mid ? '&mid=' + mid : '') + '&msg=' + msg + '|_|' + 'file:' + window.location.pathname + encodeURIComponent(url) + '|_|' + line + '&r=' + Math.random();
+                img1 = null;
+                var img2 = new Image();
+                img2.src = 'http://cgi.pub.qq.com/report/report_vm?monitors=[' + monitorId + ']&t=' + Date.now();
+                img2 = null;
+            }
+            
+        };
+        badjs.init = function(bid, mid, smid, closed) {
+            badjs._mid = mid;
+            badjs._bid = bid;
+            badjs._smid = smid;
+            badjs._closed = closed;
+        };
+        //ec为0表示成功
+        badjs.title = function(type, ec) {
+            var str = '';
+            switch (type) {
+                case 'file': //文件加载
+                    return ec ? 'File Load Error' : 'File Load Success'; //文件加载成功和失败
+                case 'cgi': //cgi请求返回信息
+                    switch (ec) { //ec表示CGI返回ec值
+                        case 0:
+                            str = 'CGI Load Success';
+                            break;
+                        case 1: //无登陆态
+                            str = 'CGI NoLogin Error';
+                            break;
+                        case 4:
+                            str = 'CGI BaseKey Error';
+                            break;
+                    }
+                    return str + '!Ec:' + (ec || '');
+                case 'http': //http请求
+                    switch (ec) { //ec表示http返回值的status
+                        case -1: //表示返回包体内容为空,自定义EC值
+                            str = 'Http Empty Error';
+                            break;
+                        case 200: //正常返回
+                            str = 'HTTP Load Success';
+                            break;
+                        case 404: //404
+                            str = 'HTTP Page Does Not Exist';
+                            break;
+                        case 500: //500
+                            str = 'HTTP Server Error';
+                            break;
+                        default: //默认
+                            str = 'Http Info';
+                            break;
+                    }
+                    return str + '!Status:' + (ec || '');
+            }
+        };
+        badjs.cgiErrMinitor = function() {
+            var img2 = new Image();
+            img2.src = 'http://cgi.pub.qq.com/report/report_vm?monitors=[464198]&t=' + Date.now();
+            img2 = null;
+        };
+
+        var arr = [];
+        global['onerror'] = function(errorMsg, file, line, row, errObj) {
+
+            /*if(errorMsg.indexOf('CGI ERROR$$$') !== -1) {
+                //处理在mockdb里面手动抛出的错误
+                badjs.cgiErrMinitor();
+                return true;
+            }*/
+
+            
+            
+            console.error(errObj.stack || errorMsg);
+            if (console.report) {
+                console.report({type:'error',content:(errObj.cgiName || '') + ' : ' + errorMsg});
+            }
+            
+            //TODO:兼容win7 下ie10第四个参数为列
+            arr.splice.apply(arguments, [3, 0, -1, null, false]);
+            badjs.apply(this, arguments); //增加onerror badjs 特殊处理
+
+            // dev mode disabled, 正式环境return true以阻止默认抛出错误
+            if (window.Config && window.Config.globalOnError) {
+                return true;
+            }
+        };
+
+        return badjs;
+    })();
+}).call(this);
+Badjs.init(258, 343293); //badjs
+
+</script>
+<script>
+/**
+ * @fileoverview loadjs
+ * @version 2.0
+ * @author webryan,henryguo glancer.h@gmail.com modify by herbertliu
+ * @author johnnyguo johnnyguo@tencent.com
+ * @lastUpdate 2014-4-3
+ * @function: 并行异步加载js且保持有序性;默认重试2次
+ * @example: loadjs.load(['a.js','b.js'],[function(){},function(){}]).wait(callback).load('c.js').wait().load('d.js');
+ * @example:回调函数的参数 function(retry, total, src){} retry:当前正在执行的次数，其中0表示第一次执行，大于0表示重试环节次数; total:重试的最大次数; src:当前执行的script url
+ */
+
+var loadjs = (function(require, exports, module) {
+    //处理列表及函数预定义,waitls,downls(废弃),donels表示js下载三种状态,tryls重试次数，flagls检查变量标记方法；exechash表示h5里执行; onload,loadfile用于回调和加载逻辑，curpos表示循环起始坐标
+    var waitls = [],
+        donels = [],
+        tagls = [],
+        tryls = [],
+        flagls = [],
+        checkls = [],
+        exechash = {},
+        onload,
+        loadfile,
+        _config = {
+            retry: 2,
+            err: function() {}
+        };
+    //加载文件部分的逻辑
+    var appendTo = document.head || document.getElementsByTagName('head')[0];
+    //webkit
+    loadfile = function(src, index, _src) {
+        var t = document.createElement('script'),
+            startTime;
+        t.async = false;
+        t.type = 'text/javascript';
+        t.index = index;
+        t._src = _src || src;
+        //console.log(arguments);
+        t.onerror = t.onload = function() {
+            t.onload = t.onerror = null;
+            var i = this.index,
+                src = this._src || this.src,
+                retrySrc = null;
+
+            if (flagls[src] && (retrySrc = flagls[src](startTime, src, checkls[src]))) {
+                //存在检验方法且检查失败,重试检查,当前处在第几次重试中,0表示未重试
+                if (tryls[i] < _config['retry']) {
+                    tryls[i] = tryls[i] + 1;
+                    t && appendTo.removeChild(t);
+                    var nextSrc = retrySrc.toString().match(/http:\/\//) ? retrySrc : this.src; //http地址
+                    (function(src, i, _src) {
+                        loadfile(src, i, _src);
+                    })(nextSrc, i, src);
+                    return;
+                } else {
+                    donels[i] = 1; //加载完毕
+                    _config.err(waitls[i]);
+                }
+            } else {
+                donels[i] = 1; //加载完毕
+            }
+            onload(t, src);
+            t = null;
+        };
+        t.src = src;
+        startTime = Date.now();
+        appendTo.appendChild(t);
+    };
+    onload = function(t, src) {
+        var _str = donels.join('');
+        var _num = parseInt(_str, 2); //计算当前总共加载的数目二进制转换大小 [1,1,1] => 7
+        var _maxLoad = Math.pow(2, _str.length) - 1;
+        var _src = waitls[_str.length - 1];
+
+        if ((_num === _maxLoad) && _src) { //全部加载完毕
+            flagls.length = tagls.length = donels.length = tryls.length = waitls.length = 0; //初始化数据
+            var p = "";
+            for (p in exechash) {
+                if (exechash.hasOwnProperty(p)) {
+                    exechash[p]();
+                    delete exechash[p];
+                }
+            }
+        }
+    }
+
+
+    var defCallback = function(loadJsStartTime, fileName, checkName) {
+        fileName = fileName.slice(fileName.lastIndexOf('/') + 1);
+        fileName = fileName.split('.');
+        if (fileName.length === 4) {
+            fileName.splice(2, 1);
+        }
+        fileName = fileName.join('.');
+        //speed.report(fileName, loadJsStartTime, Date.now());
+        if (checkName && !window[checkName]) {
+            Badjs('file error: ' + fileName, location.href, 0, 387645, 2);
+        }
+    };
+
+
+    //对外接口，load(js file,callback),wait(callback)两个; 其中fn重试的方法集,当fn返回true时，重试
+    return {
+        load: function(fileName, callback, checkName) { //flag强制清掉之前的数据
+            var ls = (fileName instanceof Array) ? fileName : [fileName];
+            callback = callback ? (callback instanceof Array) ? callback : [callback] : null;
+            checkName = checkName ? (checkName instanceof Array) ? checkName : [checkName] : null;
+            for (var i = 0, len = ls.length; i < len; i++) {
+                waitls.push(ls[i]);
+                donels.push(0);
+                tryls.push(0);
+                tagls.push(null);
+                flagls[ls[i]] = callback && callback[i] && (typeof(callback[i]) === 'function') ?
+                    callback[i] :
+                    defCallback;
+                checkls[ls[i]] = checkName && checkName[i];
+                loadfile(ls[i], waitls.length - 1);
+            }
+            return this;
+        },
+        loadModule: function(moduleName, callback) {
+            var loadJsConfig = window.loadJsConfig;
+            var module = loadJsConfig && loadJsConfig.modules && loadJsConfig.modules[moduleName];
+            if (module) {
+                //android4.0以下采用串行加载
+                var android = navigator.userAgent.match(/(Android);?[\s\/]+([\d.]+)?/);
+
+                // 各种版本包括ios都存在异步加载后没顺序执行的情况。暂时统一改成同步加载解决白屏问题
+                // 2014.10.23
+                if (true /*android && android[2]< '4.0'*/ ) {
+                    var i = 0,
+                        len = module.list.length,
+                        _this = this;
+                    var serialLoad = function() {
+                        _this.load(module.list[i], null, module.check[i]).wait(function() {
+                            if (i == len - 1) {
+                                callback && callback();
+                            } else {
+                                i++;
+                                serialLoad();
+                            }
+                        });
+                    }
+                    serialLoad();
+                } else { //android4.0+ and ios 采用并行加载
+                    this.load(module.list, module.callback, module.check);
+                    callback && this.wait(callback);
+                }
+            }
+        },
+        wait: function(callback) {
+            callback = callback || function() {};
+            exechash[waitls[waitls.length - 1]] = callback; //放到wait前最后一个js下载后执行
+            return this;
+        },
+        //默认重试2次，可以修改重试；{retry:2,err:callback} retry:重试次数，err:加载异常提示
+        config: function(o) {
+            for (var k in o) {
+                _config[k] = o[k];
+            }
+            return this;
+        },
+        //预加载文件, 不做解析与执行
+        preload: function(fileName) {
+            var ls = (fileName instanceof Array) ? fileName : [fileName];
+            var img;
+            for (var i = 0, len = ls.length; i < len; i++) {
+                img = new Image();
+                img.src = ls[i];
+            }
+            return this;
+        },
+        //预加载文件, 不做解析与执行
+        loadCss: function(href) {
+            var ss = window.document.createElement("link");
+            var ref = window.document.getElementsByTagName("script")[0];
+            ss.rel = "stylesheet";
+            ss.href = href;
+            // temporarily, set media to something non-matching to ensure it'll fetch without blocking render
+            ss.media = "all";
+            // inject link
+            ref.parentNode.insertBefore(ss, ref);
+            // set media back to `all` so that the styleshet applies once it loads
+            // setTimeout( function(){
+            //     ss.media = "all";
+            // } );
+            return ss;
+        }
+    };
+
+})();
+
+</script>
+<script src="js/zepto.min.js"></script>
+<script src="js/base.min.js"></script>
+<script src="js/index.min.js"></script>
+<script>
+;
+// 专门用于标示那些需要加上cdn前缀和md5的url
+var _url = function(url) {
+    return url;
+};
+window.loadJsConfig = {
+    modules: {
+        'main': {
+            list: [_url('js/tribesearch.min.js')],
+            check: ['TmplInline_search']
+        },
+        'mediaplayer': {
+            list: [_url('js/mediaplayer.min.js')],
+            check: ['MediaPlayer']
+        },
+        'image_view': {
+            list: [_url('js/image_view.min.js')],
+            check: ['ImageView']
+        },
+        'image_view_native': {
+            list: [_url('js/image_view_native.min.js')],
+            check: ['ImageView']
+        },
+        'recover': {
+            list: [_url('js/index_recover.min.js')],
+            check: ['Recover']
+        },
+        'my': {
+            list: [_url('js/index_my.min.js')],
+            check: ['My']
+        },
+        'around': {
+            //附近发表web版是新开页，只需加载native版
+            list: [_url('js/publish_native.min.js'), _url('js/index_nearby.min.js')],
+            check: ['Publish', 'Around']
+        },
+        cate: {
+            list : [_url('js/index_catetab.min.js')],
+            check: [ 'CateTab']
+        },
+        'category': {
+            list: [_url('js/index_category.min.js')],
+            check: ['Category']
+        }
+    }
+};
+
+(function(root, factory) {
+    factory();
+}(this, function() {
+    Home.init();
+
+
+    // loadjs.loadModule('main', function () {
+
+    //     window.addEventListener('load', function(){
+    //         setTimeout(function(){
+    //             Q.performance(7832, 47, 6);
+    //         }, 200);
+    //     });
+    // });
+}));
+
+</script>
+</body>
+</html>
+

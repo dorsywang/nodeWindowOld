@@ -57,7 +57,6 @@ var window = {
     drequire: function(filename, callback){
         filename = filename.replace("http://pub.idqqimg.com/qqun/xiaoqu/mobile/", "./");
 
-        console.log(filename);
         var urlpath = url.parse(filename);
         var search = urlpath.search;
         var query = querystring.parse((urlpath.search || "").replace(/^\?/, ""));
@@ -79,7 +78,7 @@ var window = {
 
             var content = fs.readFileSync(filepath, {encoding: "utf-8"});
 
-            console.log("require,", filepath);
+            //console.log("require,", filepath);
             vm.runInThisContext(content, filename);
 
             callback && callback();
