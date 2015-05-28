@@ -1,6 +1,8 @@
 var fireDragon = require("./../src/fireDragon");
 
-fireDragon.run("./html/testCase.html");
+var window = fireDragon.run("./html/testCase.html");
+
+document = window.document;
 
 // test getElementsByTagName
 var a = document.getElementsByTagName("img");

@@ -1,11 +1,11 @@
-module.exports = function(){
+module.exports = function(window){
 
     return {
         set hash(value){
         },
 
         get hash(){
-            var req = global.__REQ;
+            var req = window.__REQ;
 
             var originUrl;
             if(req){
@@ -16,7 +16,7 @@ module.exports = function(){
         },
 
         get search(){
-            var req = global.__REQ;
+            var req = window.__REQ;
 
             var originUrl;
             if(req){
@@ -29,12 +29,18 @@ module.exports = function(){
         set search(val){
         },
 
-        get href(){
+        set href(val){
+            window.__RES.writeHead(302, {'Location': val});
             return "";
         },
 
-        set href(url){
-            console.log("tring redirect to ", url);
+        get href(){
+            var req = window.__REQ;
+            if(req){
+                var originUrl = req.protocol + "://" + req.hostname + req.url;
+            }else{
+            }
+            return originUrl || '';
         },
 
         get pathname(){
@@ -44,4 +50,4 @@ module.exports = function(){
         replace: function(url){
         }
     };
-}();
+};

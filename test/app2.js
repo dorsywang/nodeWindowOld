@@ -9,12 +9,18 @@ var fireDragon = require("./../src/fireDragon");
     // 元素块定义
     //fireDragon.run("./../../dist/index.html");
 
-    fireDragon.run("E:\\AppServ\\www\\qunba\\dev\\index.html");
+    fireDragon.run("E:\\AppServ\\www\\qunba_trunk\\dev\\barindex.html");
     /*
     setTimeout(function(){
         fireDragon.run("./../../dev/index.html");
     }, 1000);
     */
+        /*
+        $(document.body).on("complete", function(e){
+            console.log("Triggerd");
+            console.dir(document.getElementsByTagName("head")[0]);
+        });
+        */
 module.exports = function(req, res,next){
 	var cookie = req.headers.cookie;
     global.node_cookie = cookie;
@@ -23,7 +29,7 @@ module.exports = function(req, res,next){
     var originUrl = req.protocol + "://" + req.hostname + req.url;
     var startTime = + new Date();
     // 元素块定义
-    fireDragon.run("E:\\AppServ\\www\\qunba_trunk\\dev\\index.html", req, res);
+    fireDragon.run("E:\\AppServ\\www\\qunba_trunk\\dev\\barindex.html", req, res);
 
     var headerSent = 0;
 
@@ -43,6 +49,7 @@ module.exports = function(req, res,next){
 
 
     $(document.body).on("complete", function(e){
+        console.log("Triggerd");
 
         console.log("completeTime:", (+ new Date - startTime));
         if(! headerSent){
@@ -55,7 +62,10 @@ module.exports = function(req, res,next){
         script.type = "text/javascript";
         script.innerHTML = "window.usingFireDragon = 1";
 
+
         document.getElementsByTagName("head")[0].appendChild(script);
+
+        console.log( document.getElementsByTagName("head")[0].innerHTML);
 
         RES.write("<!doctype html>");
         RES.write(document.getElementsByTagName("html")[0].outerHTML);

@@ -1,9 +1,11 @@
-module.exports = {
-    get userAgent(){
-        if(window.__REQ){
-            return (__REQ.headers['user-agent']);
-        }
+module.exports = function(windowSpace){
+    return {
+        get userAgent(){
+            if(windowSpace.__REQ){
+                return (windowSpace.__REQ.headers['user-agent']);
+            }
 
-        return "android";
-    }
+            return "android";
+        }
+    };
 };
