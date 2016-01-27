@@ -50,7 +50,17 @@ Tree.prototype = {
     backUp: function(){
         this._currNode = this._currNode.parentNode;
         this._currNodeParent = this._currNode.parentNode;
-        this._currNodesArr = this._currNode.parentNode.childNodes;
+
+        //console.log(this._currNode.parentNode, 'parentNode');
+        try{
+            if(! this._currNode.parentNode.childNodes){
+                this._currNode.parentNode.childNodes = [];
+            }
+
+            this._currNodesArr = this._currNode.parentNode.childNodes;
+        }catch(e){
+            //console.log(this._currNode, 'parentNode');
+        }
     },
 
     getNodeById: function(id){

@@ -1,4 +1,4 @@
 var fireDragon = require("./../src/fireDragon");
 
-fireDragon.run("./html/testDomCase.html");
-
+window = fireDragon.run("./html/testDom.html");
+console.log(window.body.innerHTML);

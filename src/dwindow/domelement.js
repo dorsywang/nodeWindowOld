@@ -138,7 +138,7 @@ NamedNodeMap.prototype = {
         },
 
         get ownerDocument(){
-            return document;
+            return window.document;
         },
 
         get children(){
@@ -182,7 +182,7 @@ NamedNodeMap.prototype = {
                 return node;
             }
 
-            var node = document.createDocumentFragment();
+            var node = window.document.createDocumentFragment();
 
             node.innerHTML = "<" + this.tagName + " " + this._getAttributeString() + "></" + this.tagName + ">";
 

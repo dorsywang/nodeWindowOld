@@ -1,3 +1,4 @@
 var fireDragon = require("./../src/fireDragon");
 
-fireDragon.run("E:\\AppServ\\www\\SodaRender\\test\\testNew.html");
+var window = fireDragon.run("E:\\AppServ\\www\\SodaRender\\test\\testNew.html");
+console.log(window.document.body.innerHTML);
