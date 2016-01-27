@@ -87,6 +87,14 @@ module.exports = function(window){
                 return node;
             },
 
+            createTextNode: function(text){
+                var node = new domEle.Element();
+                node.nodeType = 3;
+                node.nodeValue = text || '';
+
+                return node;
+            },
+
             addEventListener: function(event, handler, isCapture){
                 this.documentElement.addEventListener(event, handler, isCapture);
             },

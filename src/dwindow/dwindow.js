@@ -81,6 +81,7 @@ var f = function(){
         // 这里require是由script标签触发的
         drequire: function(filename, callback, isPreCompile){
             filename = filename.replace("http://pub.idqqimg.com/qqun/xiaoqu/mobile/", "./");
+            filename = filename.replace("http://s.url.cn/qqun/xiaoqu/buluo/buluoadmin/", "./");
 
             var fireDragonPath = path.dirname(module.parent.filename);
 
@@ -123,7 +124,7 @@ var f = function(){
 
                 content = fileReadMap[filename];
 
-                //console.log("fireDragon require:", filepath);
+                // console.log("fireDragon require:", filepath);
                 if(fileCompiledMap[filename]){
                 }else{
                     fileCompiledMap[filename] = new vm.Script(content);

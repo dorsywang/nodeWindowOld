@@ -132,7 +132,7 @@ var parse = function(htmlStr, scopeSpace, windowSpace){
             if(match === ">"){
                 if(currNode.getAttribute('type') && (currNode.getAttribute("type") + '').toLowerCase() !== "text/javascript"){
                 }else{
-                    if(currNode.getAttribute("src")){
+                    if(currNode.getAttribute("src")  && currNode.tagName === 'script'){
                         var attrValue = currNode.getAttribute("src");
                         var content = windowSpace.drequire(attrValue);
 
@@ -334,7 +334,7 @@ var parse = function(htmlStr, scopeSpace, windowSpace){
             if(result[0] === ">"){
                 if(currNode.getAttribute('type') && (currNode.getAttribute("type") + '').toLowerCase() !== "text/javascript"){
                 }else{
-                    if(currNode.getAttribute("src")){
+                    if(currNode.getAttribute("src") && currNode.tagName === 'script'){
                         var attrValue = currNode.getAttribute("src");
                         var content = windowSpace.drequire(attrValue);
                         /*

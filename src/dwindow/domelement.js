@@ -98,6 +98,8 @@ NamedNodeMap.prototype = {
                     return this.childNodes[0];
                 }
             };
+
+            this[name] = this[this.length - 1];
         }
     },
 
@@ -256,6 +258,7 @@ NamedNodeMap.prototype = {
                  parseCssText(this.style, val);
             }
 
+            
             this.attributes.setNamedItem(attr, val);
         },
 
@@ -320,7 +323,7 @@ NamedNodeMap.prototype = {
 
             if(newNode.tagName === "script"){
                 if(newNode.src){
-                    var content = drequire(newNode.src, function(){
+                    var content = window.drequire(newNode.src, function(){
                         newNode.onload && newNode.onload.call(newNode);
 
                         // 注意这里 把新加的脚本执行后就删除了
@@ -416,7 +419,7 @@ NamedNodeMap.prototype = {
         querySelector: function(selector, content){
             var sizzle = window.sandRequire("./../../sizzle/sizzle.js");
 
-            return sizzle(selector, content)[0];
+            return window.Sizzle(selector, content)[0];
         },
 
         querySelectorAll: function(selector, content){
@@ -556,6 +559,18 @@ NamedNodeMap.prototype = {
             for(var i = 0; i < this.childNodes.length; i ++){
                 this.childNodes[i].parentNode = this;
             }
+        },
+
+        get firstChild(){
+            return this.childNodes[0];
+        },
+
+        get lastChild(){
+            return this.childNodes[this.childNodes.length - 1];
+        },
+
+        get defaultValue(){
+            return this.value;
         },
 
         // 常用的nodeType 常量
