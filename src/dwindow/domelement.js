@@ -375,7 +375,7 @@ NamedNodeMap.prototype = {
             var classNameReg = new RegExp("(^|\\s+)" + className + "(\\s+|$)");
             if(this.childNodes.length){
                 for(var i = 0; i < this.childNodes.length; i ++){
-                    if(className.test(this.childNodes[i].className)){
+                    if((classNameReg).test(this.childNodes[i].className)){
                         result.push(this.childNodes[i]);
                     }
                     result = result.concat(this.childNodes[i].getElementsByClassName(className));

@@ -44,7 +44,7 @@ module.exports = function(window){
             var _this = this;
             var u = url.parse(this.url);
 
-            var cookie =  "ts_refer=ui.ptlogin2.qq.com/cgi-bin/login; ts_uid=8164808200; _ga=GA1.2.600442022.1448100654; pgv_pvi=8237273088; RK=Yfnuxl/mcp; pgv_si=s6515339264; pt_clientip=38900a8204ba64b3; pt_serverip=5fdd0af17263785f; ptui_loginuin=314416946; ptisp=ctc; ptcz=e78fa25f6ffc4635bf77e873c12dcb4c7f52a84c8054bb975d59a3ce8825e0b7; pt2gguin=o0314416946; uin=o0314416946; skey=@66w2mfkY7; p_uin=o0314416946; p_skey=f1cqkVY5u29xLCYBhwegqeJ9SMy3syhWUq48pWVhzJA_; pt4_token=OGXarxQWq*2ZK6lboFcMWwZbYKMV0y-4zPpvYwc1pkg_; uid=8065948; pgv_info=ssid=s3404767540; pgv_pvid=3581218800; o_cookie=314416946";
+            var cookie =  "ts_refer=ui.ptlogin2.qq.com/cgi-bin/login; ts_uid=8164808200; _ga=GA1.2.600442022.1448100654; pgv_pvi=8237273088; RK=Yfnuxl/mcp; pgv_si=s6515339264; pt_clientip=38900a8204ba64b3; pt_serverip=5fdd0af17263785f; pgv_info=ssid=s3404767540; pgv_pvid=3581218800; o_cookie=314416946; ptui_loginuin=314416946; ptisp=ctc; ptcz=e78fa25f6ffc4635bf77e873c12dcb4c7f52a84c8054bb975d59a3ce8825e0b7; pt2gguin=o0314416946; uin=o0314416946; skey=@JwDSM88sB; p_uin=o0314416946; p_skey=IKP-C6GQzjLTf7ieU5-B0WEOqC0DckKDmEiWuP6FUtw_; pt4_token=e4WCVh2OoBwk6mXoEohJZzHSJ3W0v22KtWaSJc0Sx48_";
 
 
             var headers = {
